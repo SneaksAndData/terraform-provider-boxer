@@ -1,4 +1,4 @@
-package terraform_provider_boxer
+package main
 
 import (
 	"context"
