@@ -238,7 +238,7 @@ func readPlan(ctx context.Context, basePlan tfsdk.Plan, diagnostics *diag.Diagno
 	diags := basePlan.Get(ctx, &plan)
 	diagnostics.Append(diags...)
 	if diagnostics.HasError() {
-		return nil, fmt.Errorf("error getting plan: %w", diags)
+		return nil, fmt.Errorf("error getting plan")
 	}
 	return &plan, nil
 }
@@ -248,7 +248,7 @@ func readState(ctx context.Context, baseState tfsdk.State, diagnostics *diag.Dia
 	diags := baseState.Get(ctx, &state)
 	diagnostics.Append(diags...)
 	if diagnostics.HasError() {
-		return nil, fmt.Errorf("error getting state: %w", diags)
+		return nil, fmt.Errorf("error getting state")
 	}
 	return &state, nil
 }
