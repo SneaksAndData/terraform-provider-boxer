@@ -2,8 +2,10 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	issuer "terraform-provider-boxer/pkg/generated/api"
 
@@ -84,10 +86,8 @@ func (resource *identityProviderResource) Schema(_ context.Context, _ resource.S
 
 // Create creates the resource and sets the initial Terraform state.
 func (resource *identityProviderResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan identityProviderResourceModel
-	diags := request.Plan.Get(ctx, &plan)
-	response.Diagnostics.Append(diags...)
-	if response.Diagnostics.HasError() {
+	plan, err := readPlan(ctx, request.Plan, &response.Diagnostics)
+	if err != nil {
 		return
 	}
 	registration, diags := toBoxerIssuerModel(ctx, plan)
@@ -95,7 +95,7 @@ func (resource *identityProviderResource) Create(ctx context.Context, request re
 		response.Diagnostics.Append(diags...)
 		return
 	}
-	err := resource.issuerClient.PostProvider(ctx, registration, issuer.PostProviderParams{ID: plan.Name.ValueString()})
+	err = resource.issuerClient.PostProvider(ctx, registration, issuer.PostProviderParams{ID: plan.Name.ValueString()})
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Error Creating Identity Provider",
@@ -113,10 +113,8 @@ func (resource *identityProviderResource) Create(ctx context.Context, request re
 
 // Read refreshes the Terraform state with the latest data.
 func (resource *identityProviderResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state identityProviderResourceModel
-	diags := request.State.Get(ctx, &state)
-	response.Diagnostics.Append(diags...)
-	if response.Diagnostics.HasError() {
+	state, err := readState(ctx, request.State, &response.Diagnostics)
+	if err != nil {
 		return
 	}
 	apiData, err := resource.issuerClient.GetProvider(ctx, issuer.GetProviderParams{ID: state.Name.ValueString()})
@@ -127,8 +125,8 @@ func (resource *identityProviderResource) Read(ctx context.Context, request reso
 		)
 		return
 	}
-	state = fromBoxerIssuerModel(state.ID.ValueString(), apiData)
-	diags = response.State.Set(ctx, &state)
+	newState := fromBoxerIssuerModel(state.ID.ValueString(), apiData)
+	diags := response.State.Set(ctx, &newState)
 	response.Diagnostics.Append(diags...)
 	if response.Diagnostics.HasError() {
 		return
@@ -150,7 +148,7 @@ func (resource *identityProviderResource) Update(ctx context.Context, request re
 	if response.Diagnostics.HasError() {
 		return
 	}
-	registration, diags := toBoxerIssuerModel(ctx, plan)
+	registration, diags := toBoxerIssuerModel(ctx, &plan)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -206,7 +204,7 @@ func encode(values []string) []attr.Value {
 
 }
 
-func toBoxerIssuerModel(ctx context.Context, plan identityProviderResourceModel) (*issuer.OidcIdentityProviderRegistration, diag.Diagnostics) {
+func toBoxerIssuerModel(ctx context.Context, plan *identityProviderResourceModel) (*issuer.OidcIdentityProviderRegistration, diag.Diagnostics) {
 	registration := issuer.OidcIdentityProviderRegistration{
 		DiscoveryUrl: plan.DiscoveryUrl.ValueString(),
 		UserIdClaim:  plan.UserIdClaim.ValueString(),
@@ -233,6 +231,26 @@ func fromBoxerIssuerModel(id string, apiData *issuer.OidcIdentityProviderRegistr
 		Audiences:    types.ListValueMust(types.StringType, encode(apiData.GetAudiences())),
 		Issuers:      types.ListValueMust(types.StringType, encode(apiData.GetIssuers())),
 	}
+}
+
+func readPlan(ctx context.Context, basePlan tfsdk.Plan, diagnostics *diag.Diagnostics) (*identityProviderResourceModel, error) {
+	var plan identityProviderResourceModel
+	diags := basePlan.Get(ctx, &plan)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, fmt.Errorf("error getting plan: %w", diags)
+	}
+	return &plan, nil
+}
+
+func readState(ctx context.Context, baseState tfsdk.State, diagnostics *diag.Diagnostics) (*identityProviderResourceModel, error) {
+	var state identityProviderResourceModel
+	diags := baseState.Get(ctx, &state)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, fmt.Errorf("error getting state: %w", diags)
+	}
+	return &state, nil
 }
 
 type identityProviderResourceModel struct {
