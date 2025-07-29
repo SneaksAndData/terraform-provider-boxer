@@ -6,6 +6,10 @@ terraform {
   }
 }
 
-provider "boxer" {}
+provider "boxer" {
+  issuer_host = "http://localhost:8888/"
+}
 
-data "boxer_identity_provider" "example" {}
+data "boxer_identity_provider" "example" {
+  id = "provider"
+}

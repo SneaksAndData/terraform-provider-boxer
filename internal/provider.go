@@ -31,11 +31,22 @@ func (b BoxerProvider) Metadata(ctx context.Context, request provider.MetadataRe
 }
 
 func (b BoxerProvider) Schema(ctx context.Context, request provider.SchemaRequest, response *provider.SchemaResponse) {
-	response.Schema = schema.Schema{}
+	response.Schema = schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"issuer_host": schema.StringAttribute{
+				Description: "The host of the Boxer Issuer API.",
+				Required:    true,
+			},
+		},
+	}
 }
 
 type boxerProviderModel struct {
 	IssuerHost types.String `tfsdk:"issuer_host"`
+}
+
+type BoxerProviderData struct {
+	issuerClient *issuer.Client
 }
 
 func (b BoxerProvider) Configure(ctx context.Context, request provider.ConfigureRequest, response *provider.ConfigureResponse) {
@@ -85,7 +96,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 		return
 	}
 
-	issuerClient, err := api.NewClient(host)
+	issuerClient, err := issuer.NewClient(host)
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Failed to initialize Boxer Issuer Client",
@@ -95,12 +106,17 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 		return
 	}
 
-	response.DataSourceData = issuerClient
-	response.ResourceData = issuerClient
+	data := &BoxerProviderData{
+		issuerClient: issuerClient,
+	}
+	response.DataSourceData = data
+	response.ResourceData = data
 }
 
 func (b BoxerProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		NewIdentityProviderDataSource,
+	}
 }
 
 func (b BoxerProvider) Resources(ctx context.Context) []func() resource.Resource {
