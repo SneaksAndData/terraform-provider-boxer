@@ -233,16 +233,6 @@ func fromBoxerIssuerModel(id string, apiData *issuer.OidcIdentityProviderRegistr
 	}
 }
 
-func readPlan(ctx context.Context, basePlan tfsdk.Plan, diagnostics *diag.Diagnostics) (*identityProviderResourceModel, error) {
-	var plan identityProviderResourceModel
-	diags := basePlan.Get(ctx, &plan)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, fmt.Errorf("error getting plan")
-	}
-	return &plan, nil
-}
-
 func readState(ctx context.Context, baseState tfsdk.State, diagnostics *diag.Diagnostics) (*identityProviderResourceModel, error) {
 	var state identityProviderResourceModel
 	diags := baseState.Get(ctx, &state)

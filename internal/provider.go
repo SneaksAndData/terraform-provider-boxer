@@ -115,7 +115,8 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 
 func (b BoxerProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewIdentityProviderDataSource,
+		IdentityProviderDataSource,
+		CedarSchemaDataSource,
 	}
 }
 

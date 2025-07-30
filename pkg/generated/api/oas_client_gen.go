@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-faster/errors"
+	"github.com/go-faster/jx"
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
@@ -52,7 +53,7 @@ type Invoker interface {
 	// GetSchema invokes get_schema operation.
 	//
 	// GET /schema/{id}
-	GetSchema(ctx context.Context, params GetSchemaParams) error
+	GetSchema(ctx context.Context, params GetSchemaParams) (jx.Raw, error)
 	// PostAssociation invokes post_association operation.
 	//
 	// POST /association/
@@ -561,12 +562,12 @@ func (c *Client) sendGetProvider(ctx context.Context, params GetProviderParams) 
 // GetSchema invokes get_schema operation.
 //
 // GET /schema/{id}
-func (c *Client) GetSchema(ctx context.Context, params GetSchemaParams) error {
-	_, err := c.sendGetSchema(ctx, params)
-	return err
+func (c *Client) GetSchema(ctx context.Context, params GetSchemaParams) (jx.Raw, error) {
+	res, err := c.sendGetSchema(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendGetSchema(ctx context.Context, params GetSchemaParams) (res *GetSchemaOK, err error) {
+func (c *Client) sendGetSchema(ctx context.Context, params GetSchemaParams) (res jx.Raw, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [2]string

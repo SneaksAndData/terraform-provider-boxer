@@ -16,31 +16,17 @@ var (
 	_ datasource.DataSourceWithConfigure = &identityProviderDataSource{}
 )
 
-// NewIdentityProviderDataSource is a helper function to simplify the provider implementation.
-func NewIdentityProviderDataSource() datasource.DataSource {
+// IdentityProviderDataSource is a helper function to simplify the provider implementation.
+func IdentityProviderDataSource() datasource.DataSource {
 	return &identityProviderDataSource{}
 }
 
 func (dataSource *identityProviderDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
+	client := getIssuerClient(request, response)
+	if client == nil {
 		return
 	}
-	data, ok := request.ProviderData.(*BoxerProviderData)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Invalid Provider Data",
-			"The provider data must be of type *BoxerProviderData, but was %s. This is most likely the bug in the provider implementation.",
-		)
-		return
-	}
-	if data.issuerClient == nil {
-		response.Diagnostics.AddError(
-			"Invalid Issuer Client",
-			"The issuer client must not be nil. This is most likely the bug in the provider implementation.",
-		)
-		return
-	}
-	dataSource.issuerClient = data.issuerClient
+	dataSource.issuerClient = client
 }
 
 // Metadata returns the data source type name.
