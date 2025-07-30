@@ -22,7 +22,7 @@ func CedarSchemaDataSource() datasource.DataSource {
 }
 
 func (dataSource *cedarSchemaDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	client := getIssuerClient(request, response)
+	client := getDataSourceIssuerClient(request, response)
 	if client == nil {
 		return
 	}
@@ -52,7 +52,7 @@ func (dataSource *cedarSchemaDataSource) Schema(_ context.Context, _ datasource.
 
 // Read refreshes the Terraform state with the latest data.
 func (dataSource *cedarSchemaDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	tflog.Info(ctx, "Reading identity provider data source")
+	tflog.Info(ctx, "Reading cedar schema data source")
 	var config cedarSchemaDataSourceModel
 	diags := request.Config.Get(ctx, &config)
 	response.Diagnostics.Append(diags...)
@@ -61,10 +61,7 @@ func (dataSource *cedarSchemaDataSource) Read(ctx context.Context, request datas
 	}
 	apiData, err := dataSource.issuerClient.GetSchema(ctx, issuer.GetSchemaParams{ID: config.ID.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error reading identity provider",
-			"An error occurred while reading the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Reading", "Cedar Schema", err)
 		return
 	}
 	config.DataJson = types.StringValue(apiData.String())

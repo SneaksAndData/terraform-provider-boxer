@@ -25,25 +25,11 @@ func IdentityProviderResource() resource.Resource {
 }
 
 func (resource *identityProviderResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
-	if request.ProviderData == nil {
+	client := getResourceIssuerClient(request, response)
+	if client == nil {
 		return
 	}
-	data, ok := request.ProviderData.(*BoxerProviderData)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Invalid Provider Data",
-			"The provider data must be of type *BoxerProviderData, but was %s. This is most likely the bug in the provider implementation.",
-		)
-		return
-	}
-	if data.issuerClient == nil {
-		response.Diagnostics.AddError(
-			"Invalid Issuer Client",
-			"The issuer client must not be nil. This is most likely the bug in the provider implementation.",
-		)
-		return
-	}
-	resource.issuerClient = data.issuerClient
+	resource.issuerClient = client
 }
 
 // Metadata returns the resource type name.
@@ -86,7 +72,7 @@ func (resource *identityProviderResource) Schema(_ context.Context, _ resource.S
 
 // Create creates the resource and sets the initial Terraform state.
 func (resource *identityProviderResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	plan, err := readPlan(ctx, request.Plan, &response.Diagnostics)
+	plan, err := readIdentityProviderPlan(ctx, request.Plan, &response.Diagnostics)
 	if err != nil {
 		return
 	}
@@ -97,10 +83,7 @@ func (resource *identityProviderResource) Create(ctx context.Context, request re
 	}
 	err = resource.issuerClient.PostProvider(ctx, registration, issuer.PostProviderParams{ID: plan.Name.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error Creating Identity Provider",
-			"An error occurred while creating the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Creating", "Identity Provider", err)
 		return
 	}
 	plan.ID = types.StringValue(plan.Name.ValueString())
@@ -119,10 +102,7 @@ func (resource *identityProviderResource) Read(ctx context.Context, request reso
 	}
 	apiData, err := resource.issuerClient.GetProvider(ctx, issuer.GetProviderParams{ID: state.Name.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error reading identity provider",
-			"An error occurred while reading the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Reading", "Identity Provider", err)
 		return
 	}
 	newState := fromBoxerIssuerModel(state.ID.ValueString(), apiData)
@@ -155,18 +135,12 @@ func (resource *identityProviderResource) Update(ctx context.Context, request re
 	}
 	err := resource.issuerClient.PostProvider(ctx, registration, issuer.PostProviderParams{ID: state.Name.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error Updating Identity Provider",
-			"An error occurred while creating the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Updating", "Identity Provider", err)
 		return
 	}
 	apiData, err := resource.issuerClient.GetProvider(ctx, issuer.GetProviderParams{ID: state.Name.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error reading identity provider",
-			"An error occurred while reading the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Reading", "Identity Provider", err)
 		return
 	}
 	plan = fromBoxerIssuerModel(state.Name.ValueString(), apiData)
@@ -187,10 +161,7 @@ func (resource *identityProviderResource) Delete(ctx context.Context, request re
 	}
 	err := resource.issuerClient.DeleteProvider(ctx, issuer.DeleteProviderParams{ID: plan.Name.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error Deleting Identity Provider",
-			"An error occurred while deleting the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Deleting", "Identity Provider", err)
 		return
 	}
 }
@@ -255,4 +226,14 @@ type identityProviderResourceModel struct {
 // identityProviderResource is the resource implementation.
 type identityProviderResource struct {
 	issuerClient *issuer.Client
+}
+
+func readIdentityProviderPlan(ctx context.Context, basePlan tfsdk.Plan, diagnostics *diag.Diagnostics) (*identityProviderResourceModel, error) {
+	var plan identityProviderResourceModel
+	diags := basePlan.Get(ctx, &plan)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, fmt.Errorf("error getting plan")
+	}
+	return &plan, nil
 }

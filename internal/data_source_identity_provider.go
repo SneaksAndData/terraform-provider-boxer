@@ -22,7 +22,7 @@ func IdentityProviderDataSource() datasource.DataSource {
 }
 
 func (dataSource *identityProviderDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	client := getIssuerClient(request, response)
+	client := getDataSourceIssuerClient(request, response)
 	if client == nil {
 		return
 	}
@@ -65,10 +65,7 @@ func (dataSource *identityProviderDataSource) Read(ctx context.Context, request 
 	}
 	apiData, err := dataSource.issuerClient.GetProvider(ctx, issuer.GetProviderParams{ID: id.ID.ValueString()})
 	if err != nil {
-		response.Diagnostics.AddError(
-			"Error reading identity provider",
-			"An error occurred while reading the identity provider: "+err.Error(),
-		)
+		generateError(&response.Diagnostics, "Reading", "Identity Provider", err)
 		return
 	}
 	id.DiscoveryUrl = types.StringValue(apiData.GetDiscoveryUrl())
