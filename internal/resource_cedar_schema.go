@@ -98,7 +98,7 @@ func (resource *cedarSchemaResource) Update(ctx context.Context, request resourc
 	}
 	state, err := readCedarSchemaState(ctx, request.State, &response.Diagnostics)
 	if err != nil {
-
+		return
 	}
 
 	err = resource.issuerClient.PostSchema(ctx, jx.Raw(plan.DataJson.ValueString()), issuer.PostSchemaParams{ID: plan.ID.ValueString()})
