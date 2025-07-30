@@ -115,15 +115,15 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 
 func (b BoxerProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		IdentityProviderDataSource,
-		CedarSchemaDataSource,
+		NewIdentityProviderDataSource,
+		NewCedarSchemaDataSource,
 	}
 }
 
 func (b BoxerProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		IdentityProviderResource,
-		CedarSchemaResource,
+		NewIdentityProviderResource,
+		NewCedarSchemaResource,
 	}
 }
 

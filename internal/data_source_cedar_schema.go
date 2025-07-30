@@ -16,20 +16,23 @@ var (
 	_ datasource.DataSourceWithConfigure = &cedarSchemaDataSource{}
 )
 
-// CedarSchemaDataSource is a helper function to simplify the provider implementation.
-func CedarSchemaDataSource() datasource.DataSource {
+// NewCedarSchemaDataSource is a helper function to simplify the provider implementation.
+func NewCedarSchemaDataSource() datasource.DataSource {
 	return &cedarSchemaDataSource{}
 }
 
 func (dataSource *cedarSchemaDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
 	client := getDataSourceIssuerClient(request, response)
 	if client == nil {
+		// If the client is nil, we cannot proceed with the data source.
+		// This method will be called again when the provider is configured,
+		// so we can safely return here without setting the client.
 		return
 	}
 	dataSource.issuerClient = client
 }
 
-// Metadata returns the data source type name.
+// Metadata responds with the data source type name.
 func (dataSource *cedarSchemaDataSource) Metadata(_ context.Context, request datasource.MetadataRequest, response *datasource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_cedar_schema"
 }
