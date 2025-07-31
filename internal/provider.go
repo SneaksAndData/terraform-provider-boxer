@@ -126,6 +126,7 @@ func (b BoxerProvider) Resources(_ context.Context) []func() resource.Resource {
 		NewIdentityProviderResource,
 		NewCedarSchemaResource,
 		NewBoxerPrincipalResource,
+		NewBoxerExternalIdentityResource,
 	}
 }
 

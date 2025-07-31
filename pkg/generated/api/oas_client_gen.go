@@ -41,7 +41,7 @@ type Invoker interface {
 	// GetIdentity invokes get_identity operation.
 	//
 	// GET /identity/{identity_provider}/{id}
-	GetIdentity(ctx context.Context, params GetIdentityParams) error
+	GetIdentity(ctx context.Context, params GetIdentityParams) (*ExternalIdentityResponse, error)
 	// GetPrincipal invokes get_principal operation.
 	//
 	// GET /principal/{schema}/{id}
@@ -368,12 +368,12 @@ func (c *Client) sendGetAssociation(ctx context.Context, params GetAssociationPa
 // GetIdentity invokes get_identity operation.
 //
 // GET /identity/{identity_provider}/{id}
-func (c *Client) GetIdentity(ctx context.Context, params GetIdentityParams) error {
-	_, err := c.sendGetIdentity(ctx, params)
-	return err
+func (c *Client) GetIdentity(ctx context.Context, params GetIdentityParams) (*ExternalIdentityResponse, error) {
+	res, err := c.sendGetIdentity(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendGetIdentity(ctx context.Context, params GetIdentityParams) (res *GetIdentityOK, err error) {
+func (c *Client) sendGetIdentity(ctx context.Context, params GetIdentityParams) (res *ExternalIdentityResponse, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [4]string

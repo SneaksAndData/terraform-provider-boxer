@@ -11,8 +11,34 @@ type DeleteProviderOK struct{}
 // DeleteSchemaOK is response for DeleteSchema operation.
 type DeleteSchemaOK struct{}
 
-// GetIdentityOK is response for GetIdentity operation.
-type GetIdentityOK struct{}
+// Struct that represents an external identity.
+// Ref: #/components/schemas/ExternalIdentityResponse
+type ExternalIdentityResponse struct {
+	// The name of the external identity provider.
+	IdentityProvider string `json:"identityProvider"`
+	// The user ID extracted from the external identity provider.
+	UserId string `json:"userId"`
+}
+
+// GetIdentityProvider returns the value of IdentityProvider.
+func (s *ExternalIdentityResponse) GetIdentityProvider() string {
+	return s.IdentityProvider
+}
+
+// GetUserId returns the value of UserId.
+func (s *ExternalIdentityResponse) GetUserId() string {
+	return s.UserId
+}
+
+// SetIdentityProvider sets the value of IdentityProvider.
+func (s *ExternalIdentityResponse) SetIdentityProvider(val string) {
+	s.IdentityProvider = val
+}
+
+// SetUserId sets the value of UserId.
+func (s *ExternalIdentityResponse) SetUserId(val string) {
+	s.UserId = val
+}
 
 // Ref: #/components/schemas/IdentityAssociation
 type IdentityAssociation struct {
