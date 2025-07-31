@@ -11,6 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
+const TokenContextKey = security.ContextKey("token")
+
 // Ensure the implementation satisfies the expected interfaces.
 var (
 	_ datasource.DataSource              = &boxerTokenDataSource{}
@@ -30,7 +32,7 @@ func (dataSource *boxerTokenDataSource) Configure(_ context.Context, request dat
 		// so we can safely return here without setting the issuerHost.
 		return
 	}
-	client, err := issuer.NewClient(issuerHost, security.NewSecuritySourceFromContext("Token"))
+	client, err := issuer.NewClient(issuerHost, security.NewSecuritySourceFromContext(TokenContextKey))
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Invalid Issuer Client",
@@ -59,8 +61,8 @@ func (dataSource *boxerTokenDataSource) Schema(_ context.Context, _ datasource.S
 				Description: "The authentication details for the external identity.",
 				Required:    true,
 				Attributes: map[string]schema.Attribute{
-					"header": schema.StringAttribute{
-						Description: "The authorization header for the external identity.",
+					"bearer": schema.StringAttribute{
+						Description: "The bearer token for the external identity.",
 						Required:    true,
 					},
 				},
@@ -84,7 +86,7 @@ func (dataSource *boxerTokenDataSource) Read(ctx context.Context, request dataso
 		return
 	}
 
-	childContext := context.WithValue(ctx, "Token", configModel.Auth.Header.ValueString())
+	childContext := context.WithValue(ctx, TokenContextKey, configModel.Auth.Header.ValueString())
 	token, err := dataSource.issuerClient.Token(childContext, issuer.TokenParams{
 		IdentityProvider: configModel.IdentityProvider.ValueString(),
 	})
@@ -115,7 +117,7 @@ func (dataSource *boxerTokenDataSource) Read(ctx context.Context, request dataso
 }
 
 type boxerTokenAuthModel struct {
-	Header types.String `tfsdk:"header"`
+	Header types.String `tfsdk:"bearer"`
 }
 
 type boxerTokenDataSourceModel struct {

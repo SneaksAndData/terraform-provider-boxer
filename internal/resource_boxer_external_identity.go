@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -43,17 +45,17 @@ func (resource *boxerExternalIdentity) Metadata(_ context.Context, request resou
 // Schema defines the schema for the resource.
 func (resource *boxerExternalIdentity) Schema(_ context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = schema.Schema{
-		// TODO: id, identity provider should force resource recreation
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "The unique identifier of the principal.",
-				Required:    true,
+				Description:   "The unique identifier of the principal.",
+				Required:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"identity_provider": schema.StringAttribute{
-				Description: "The identity provider that the external identity belongs to.",
-				Required:    true,
+				Description:   "The identity provider that the external identity belongs to.",
+				Required:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-
 			"principal": schema.SingleNestedAttribute{
 				Description: "The principal ID associated to the external identity.",
 				Required:    true,

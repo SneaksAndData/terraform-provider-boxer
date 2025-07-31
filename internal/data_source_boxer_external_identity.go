@@ -110,11 +110,6 @@ func (dataSource *boxerExternalIdentityDataSource) Read(ctx context.Context, req
 	}
 }
 
-type boxerPrincipalAssociationDataSourceModel struct {
-	PrincipalId types.String `tfsdk:"principal_id"`
-	SchemaId    types.String `tfsdk:"schema_id"`
-}
-
 type boxerExternalIdentityDataSourceModel struct {
 	ID               types.String                    `tfsdk:"id"`
 	IdentityProvider types.String                    `tfsdk:"identity_provider"`

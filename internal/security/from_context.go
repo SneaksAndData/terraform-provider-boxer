@@ -6,13 +6,15 @@ import (
 	issuer "terraform-provider-boxer/pkg/generated/api"
 )
 
+type ContextKey string
+
 // Validate that securitySourceFromContext implements issuer.SecuritySource.
 var (
 	_ issuer.SecuritySource = securitySourceFromContext{}
 )
 
 // NewSecuritySourceFromContext creates a new instance of securitySourceFromContext.
-func NewSecuritySourceFromContext(contextField string) issuer.SecuritySource {
+func NewSecuritySourceFromContext(contextField ContextKey) issuer.SecuritySource {
 	return securitySourceFromContext{
 		field: contextField,
 	}
@@ -21,7 +23,7 @@ func NewSecuritySourceFromContext(contextField string) issuer.SecuritySource {
 // securitySourceFromContext is a no-op implementation of issuer.SecuritySource.
 // It returns an empty token for any external security request.
 type securitySourceFromContext struct {
-	field string
+	field ContextKey
 }
 
 // External implements the issuer.SecuritySource interface.
