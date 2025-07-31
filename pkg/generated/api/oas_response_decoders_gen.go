@@ -3,6 +3,7 @@
 package issuer
 
 import (
+	"bytes"
 	"io"
 	"mime"
 	"net/http"
@@ -336,11 +337,27 @@ func decodePostSchemaResponse(resp *http.Response) (res *PostSchemaOK, _ error) 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeTokenResponse(resp *http.Response) (res *TokenOK, _ error) {
+func decodeTokenResponse(resp *http.Response) (res TokenOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
-		return &TokenOK{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "text/plain":
+			reader := resp.Body
+			b, err := io.ReadAll(reader)
+			if err != nil {
+				return res, err
+			}
+
+			response := TokenOK{Data: bytes.NewReader(b)}
+			return response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
