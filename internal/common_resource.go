@@ -32,7 +32,7 @@ func getResourceIssuerClient(request resource.ConfigureRequest, response *resour
 	return client
 }
 
-func readFromState(ctx context.Context, target interface{}, baseState tfsdk.State, diagnostics *diag.Diagnostics) error {
+func readFromState(ctx context.Context, target any, baseState tfsdk.State, diagnostics *diag.Diagnostics) error {
 	diags := baseState.Get(ctx, target)
 	diagnostics.Append(diags...)
 	if diagnostics.HasError() {
