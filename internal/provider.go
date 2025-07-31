@@ -118,6 +118,7 @@ func (b BoxerProvider) DataSources(_ context.Context) []func() datasource.DataSo
 		NewIdentityProviderDataSource,
 		NewCedarSchemaDataSource,
 		NewBoxerPrincipalDataSource,
+		NewBoxerExternalIdentityDataSource,
 	}
 }
 
