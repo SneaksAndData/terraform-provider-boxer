@@ -1,4 +1,4 @@
-package provider
+package issuer
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"os"
-	"terraform-provider-boxer/pkg/generated/api"
+	"terraform-provider-boxer/pkg/generated/api/issuerClient"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -46,7 +46,7 @@ type boxerProviderModel struct {
 }
 
 type BoxerProviderData struct {
-	issuerClient *issuer.Client
+	issuerClient *issuerClient.Client
 }
 
 func (b BoxerProvider) Configure(ctx context.Context, request provider.ConfigureRequest, response *provider.ConfigureResponse) {
@@ -96,7 +96,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 		return
 	}
 
-	issuerClient, err := issuer.NewClient(host)
+	client, err := issuerClient.NewClient(host)
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Failed to initialize Boxer Issuer Client",
@@ -107,7 +107,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 	}
 
 	data := &BoxerProviderData{
-		issuerClient: issuerClient,
+		issuerClient: client,
 	}
 	response.DataSourceData = data
 	response.ResourceData = data
