@@ -106,7 +106,7 @@ resource "boxer_external_identity" "example" {
 data boxer_token "example" {
   identity_provider = boxer_identity_provider.example.name
   auth = {
-    # For testing pruppose, provide the bearer token value manually
+    # For testing purposes, provide the bearer token value manually
     bearer = ""
   }
 }
