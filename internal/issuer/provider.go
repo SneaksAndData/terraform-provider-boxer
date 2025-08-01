@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"os"
+	"terraform-provider-boxer/internal/security"
 	"terraform-provider-boxer/pkg/generated/api/issuerClient"
 )
 
@@ -46,6 +47,8 @@ type boxerProviderModel struct {
 }
 
 type BoxerProviderData struct {
+	issuerClient *issuer.Client
+	issuerHost   string
 	issuerClient *issuerClient.Client
 }
 
@@ -96,7 +99,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 		return
 	}
 
-	client, err := issuerClient.NewClient(host)
+	client, err := issuerClient.NewClient(host, security.NewEmptySecuritySource())
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Failed to initialize Boxer Issuer Client",
@@ -108,6 +111,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 
 	data := &BoxerProviderData{
 		issuerClient: client,
+		issuerHost:   host,
 	}
 	response.DataSourceData = data
 	response.ResourceData = data
@@ -118,6 +122,8 @@ func (b BoxerProvider) DataSources(_ context.Context) []func() datasource.DataSo
 		NewIdentityProviderDataSource,
 		NewCedarSchemaDataSource,
 		NewBoxerPrincipalDataSource,
+		NewBoxerExternalIdentityDataSource,
+		NewBoxerTokenDataSource,
 	}
 }
 
@@ -126,6 +132,7 @@ func (b BoxerProvider) Resources(_ context.Context) []func() resource.Resource {
 		NewIdentityProviderResource,
 		NewCedarSchemaResource,
 		NewBoxerPrincipalResource,
+		NewBoxerExternalIdentityResource,
 	}
 }
 
