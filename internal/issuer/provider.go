@@ -47,7 +47,6 @@ type boxerProviderModel struct {
 }
 
 type BoxerProviderData struct {
-	issuerClient *issuer.Client
 	issuerHost   string
 	issuerClient *issuerClient.Client
 }
