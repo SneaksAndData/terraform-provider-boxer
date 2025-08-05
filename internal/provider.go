@@ -159,6 +159,7 @@ func (b BoxerProvider) Resources(_ context.Context) []func() resource.Resource {
 		// Boxer Validator resources
 		validator.NewCedarSchemaResource,
 		validator.NewActionDiscoveryDocumentResource,
+		validator.NewResourceDiscoveryDocumentResource,
 	}
 }
 
