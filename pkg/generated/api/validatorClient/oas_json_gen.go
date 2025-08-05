@@ -275,8 +275,8 @@ func (s *ResourceRouteRegistration) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ResourceRouteRegistration) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("actionUid")
-		e.Str(s.ActionUid)
+		e.FieldStart("resourceUid")
+		e.Str(s.ResourceUid)
 	}
 	{
 		e.FieldStart("routeTemplate")
@@ -285,7 +285,7 @@ func (s *ResourceRouteRegistration) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfResourceRouteRegistration = [2]string{
-	0: "actionUid",
+	0: "resourceUid",
 	1: "routeTemplate",
 }
 
@@ -298,17 +298,17 @@ func (s *ResourceRouteRegistration) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "actionUid":
+		case "resourceUid":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
-				s.ActionUid = string(v)
+				s.ResourceUid = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"actionUid\"")
+				return errors.Wrap(err, "decode field \"resourceUid\"")
 			}
 		case "routeTemplate":
 			requiredBitSet[0] |= 1 << 1

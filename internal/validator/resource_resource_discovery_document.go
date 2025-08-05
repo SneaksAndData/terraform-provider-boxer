@@ -204,7 +204,7 @@ func (model *resourceDiscoveryDocumentResourceModel) Into() *validatorClient.Res
 	for i, route := range model.Routes {
 		registration.Routes[i] = validatorClient.ResourceRouteRegistration{
 			RouteTemplate: route.Path.ValueString(),
-			ActionUid:     route.Resource.ValueString(),
+			ResourceUid:   route.Resource.ValueString(),
 		}
 	}
 
@@ -217,7 +217,7 @@ func (model *resourceDiscoveryDocumentResourceModel) From(source *validatorClien
 	for i, route := range source.Routes {
 		model.Routes[i] = resourceResourceRouteModel{
 			Path:     types.StringValue(route.RouteTemplate),
-			Resource: types.StringValue(route.ActionUid),
+			Resource: types.StringValue(route.ResourceUid),
 		}
 	}
 	return model

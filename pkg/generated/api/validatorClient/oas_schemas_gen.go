@@ -85,13 +85,13 @@ type PostSchemaOK struct{}
 
 // Ref: #/components/schemas/ResourceRouteRegistration
 type ResourceRouteRegistration struct {
-	ActionUid     string `json:"actionUid"`
+	ResourceUid   string `json:"resourceUid"`
 	RouteTemplate string `json:"routeTemplate"`
 }
 
-// GetActionUid returns the value of ActionUid.
-func (s *ResourceRouteRegistration) GetActionUid() string {
-	return s.ActionUid
+// GetResourceUid returns the value of ResourceUid.
+func (s *ResourceRouteRegistration) GetResourceUid() string {
+	return s.ResourceUid
 }
 
 // GetRouteTemplate returns the value of RouteTemplate.
@@ -99,9 +99,9 @@ func (s *ResourceRouteRegistration) GetRouteTemplate() string {
 	return s.RouteTemplate
 }
 
-// SetActionUid sets the value of ActionUid.
-func (s *ResourceRouteRegistration) SetActionUid(val string) {
-	s.ActionUid = val
+// SetResourceUid sets the value of ResourceUid.
+func (s *ResourceRouteRegistration) SetResourceUid(val string) {
+	s.ResourceUid = val
 }
 
 // SetRouteTemplate sets the value of RouteTemplate.
