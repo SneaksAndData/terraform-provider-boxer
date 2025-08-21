@@ -37,5 +37,6 @@ resource "boxer_external_identity" "alice" {
     schema_id    = boxer_principal.alice.schema_id
     principal_id = boxer_principal.alice.id
   }
+  validator_schema_id = boxer_validator_cedar_schema.integration_test.id
 }
 

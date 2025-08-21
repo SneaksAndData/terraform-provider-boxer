@@ -33,5 +33,6 @@ export INTERNAL_TOKEN=$(terraform output -json test | jq --raw-output .token) &&
 curl -v -X 'GET' 'http://localhost:8081/token/review' \
   -H "X-Original-URL: http://www.example.com/api/v1/resources" -H "X-Original-Method: GET" \
   -H "Authorization: Bearer $INTERNAL_TOKEN"
+  
 ```
 

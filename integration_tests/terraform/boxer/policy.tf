@@ -7,11 +7,5 @@ resource "boxer_policy_set" "vacation_photo_access_policy" {
       action == PhotoApp::Action::"viewPhoto",
       resource == PhotoApp::Photo::"vacationPhoto.jpg"
   );
-
-  permit (
-      principal,
-      action,
-      resource
-  )
 EOT
 }
