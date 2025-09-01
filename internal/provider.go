@@ -151,11 +151,17 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 	tokenEndpoint := config.ExternalAuth.InternalTokenProviderEndpoint.ValueString()
 	externalSecuritySource := security.IssuerStaticSecuritySource(config.ExternalAuth.SecurityToken.ValueString())
 	externalAuthIssuerClient, err := issuerClient.NewClient(tokenEndpoint, externalSecuritySource)
+	if err != nil {
+		response.Diagnostics.AddError(
+			"Failed to initialize Self-authorization client",
+			"An unexpected error occurred when creating the Boxer Issuer client: "+err.Error(),
+		)
+		return
+	}
 
 	internalTokenReader := security.NewInternalTokenReader(externalAuthIssuerClient, config.ExternalAuth.IdentityProviderID.ValueString())
 
-	issuerApiClient, err := issuerClient.NewClient(issuerHost,
-		security.NewIssuerInternalSecuritySource(internalTokenReader))
+	issuerApiClient, err := issuerClient.NewClient(issuerHost, security.NewIssuerInternalSecuritySource(internalTokenReader))
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Failed to initialize Boxer Issuer Client",
@@ -164,8 +170,7 @@ func (b BoxerProvider) Configure(ctx context.Context, request provider.Configure
 		return
 	}
 
-	validatorApiClient, err := validatorClient.NewClient(validatorHost,
-		security.NewValidatorInternalSecuritySource(internalTokenReader))
+	validatorApiClient, err := validatorClient.NewClient(validatorHost, security.NewValidatorInternalSecuritySource(internalTokenReader))
 	if err != nil {
 		response.Diagnostics.AddError(
 			"Failed to initialize Boxer Validator Client",
