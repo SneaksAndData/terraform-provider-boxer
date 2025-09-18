@@ -27,5 +27,4 @@ Additional changes:
 ---
 - [ ] This commit contains breaking changes.
 > [!WARNING]
-> If you check this box, please ensure that you follow the
-> [breaking change process](https://developer.hashicorp.com/terraform/plugin/sdkv2/best-practices/deprecations)
+> If you check this box, please ensure that you follow the [breaking change process](https://developer.hashicorp.com/terraform/plugin/sdkv2/best-practices/deprecations)
