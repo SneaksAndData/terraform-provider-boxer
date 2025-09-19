@@ -10,8 +10,8 @@ docker-compose up -d
 export TF_VAR_external_token=$(curl \
   -d "client_id=test_client" \
   -d "client_secret=test_client_secret" \
-  -d "username=test_user" \
-  -d "password=test_user_password" \
+  -d "username=test_root" \
+  -d "password=test-root-password" \
   -d "grant_type=password" \
   "http://localhost:8080/realms/master/protocol/openid-connect/token" | jq -r '.access_token') && echo $TF_VAR_external_token
   
