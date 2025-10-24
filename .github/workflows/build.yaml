@@ -50,14 +50,14 @@ jobs:
 
       - name: Wait for apps to be ready
         run: |
-          kubectl wait --for=condition=ready pod -l app=foo --timeout=120s || true
-          kubectl wait --for=condition=ready pod -l app=bar --timeout=120s || true
-          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-issuer --timeout=120s || true
-          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-validator-nginx --timeout=120s || true
+          kubectl wait --for=condition=ready pod -l app=foo --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=bar --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-issuer --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-validator-nginx --timeout=120s
           kubectl wait --namespace ingress-nginx \
             --for=condition=ready pod \
             --selector=app.kubernetes.io/component=controller \
-            --timeout=120s || true
+            --timeout=120s
 
       - name: Wait for service
         run: |
@@ -72,10 +72,10 @@ jobs:
       - name: Get logs from application pods
         if: always()
         run: |
-          kubectl logs -l app=foo
-          kubectl logs -l app=bar
-          kubectl logs -l app.kubernetes.io/name=boxer-issuer
-          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx
+          kubectl logs -l app=foo || true
+          kubectl logs -l app=bar || true
+          kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
+          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
 
       - name: Check Format
         run: gofmt -d ./
