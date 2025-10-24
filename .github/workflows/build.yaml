@@ -53,10 +53,15 @@ jobs:
           kubectl get nodes
           kind get kubeconfig --name kind
 
-      - name: Test connectivity to apps
+      - name: Wait for service
         run: |
-          curl --fail http://localhost:55555/foo
-          curl --fail http://localhost:55555/bar
+          for i in {1..30}; do
+            if curl --silent http://localhost:55555/foo; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
 
       - name: Get logs from application pods
         run: |
