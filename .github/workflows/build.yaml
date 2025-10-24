@@ -47,6 +47,12 @@ jobs:
           kubectl wait --for=condition=ready pod -l app=foo --timeout=120s
           kubectl wait --for=condition=ready pod -l app=bar --timeout=120s
 
+      - name: Check kind cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kind get kubeconfig --name kind
+
       - name: Test connectivity to apps
         run: |
           curl --fail http://localhost:8888/foo
