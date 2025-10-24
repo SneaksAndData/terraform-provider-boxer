@@ -43,8 +43,8 @@ jobs:
 
       - name: Install integration test dependencies
         run: |
-          helm dependency build ./integration-tests/helm/setup
-          helm install integration-tests ./integration-tests/helm/setup \
+          helm dependency build ./integration_tests/helm/setup
+          helm install integration_tests ./integration_tests/helm/setup \
             --set boxer-issuer.issuer.replicas=1 \
             --set boxer-validator-nginx.validator.replicas=1
 
