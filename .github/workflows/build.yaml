@@ -29,29 +29,35 @@ jobs:
           cluster_name: 'kind'
           config: integration_tests/kind.yaml
 
-      - name: Deploy Ingress NGINX Controller
-        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
-
-      - name: Wait for Ingress NGINX Controller to be ready
-        run: |
-          kubectl wait --namespace ingress-nginx \
-            --for=condition=ready pod \
-            --selector=app.kubernetes.io/component=controller \
-            --timeout=120s
-
-      - name: Deploy apps
-        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
-
-      - name: Wait for apps to be ready
-        run: |
-          kubectl wait --for=condition=ready pod -l app=foo --timeout=120s
-          kubectl wait --for=condition=ready pod -l app=bar --timeout=120s
-
       - name: Check kind cluster
         run: |
           kubectl cluster-info
           kubectl get nodes
           kind get kubeconfig --name kind
+
+      - name: Deploy Ingress NGINX Controller
+        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
+
+      - name: Deploy apps
+        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
+
+      - name: Install integration test dependencies
+        run: |
+          helm dependency build ./integration-tests/helm/setup
+          helm install integration-tests ./integration-tests/helm/setup \
+            --set boxer-issuer.issuer.replicas=1 \
+            --set boxer-validator-nginx.validator.replicas=1
+
+      - name: Wait for apps to be ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app=foo --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=bar --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-issuer --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-validator-nginx --timeout=120s
+          kubectl wait --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=120s
 
       - name: Wait for service
         run: |
@@ -64,9 +70,12 @@ jobs:
           exit 1
 
       - name: Get logs from application pods
+        if: always()
         run: |
           kubectl logs -l app=foo
           kubectl logs -l app=bar
+          kubectl logs -l app.kubernetes.io/name=boxer-issuer
+          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx
 
       - name: Check Format
         run: gofmt -d ./
