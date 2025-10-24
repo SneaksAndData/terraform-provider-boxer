@@ -58,6 +58,11 @@ jobs:
           curl --fail http://localhost:55555/foo
           curl --fail http://localhost:55555/bar
 
+      - name: Get logs from application pods
+        run: |
+          kubectl logs -l app=foo
+          kubectl logs -l app=bar
+
       - name: Check Format
         run: gofmt -d ./
 
