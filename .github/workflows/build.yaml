@@ -42,6 +42,11 @@ jobs:
       - name: Deploy apps
         run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
 
+      - name: Wait for apps to be ready
+        run: |
+          kubectl wait --for=condition=ready pod -l app=foo --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=bar --timeout=120s
+
       - name: Test connectivity to apps
         run: |
           curl --fail http://localhost:8888/foo
