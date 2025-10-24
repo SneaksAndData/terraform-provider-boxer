@@ -38,8 +38,8 @@ jobs:
       - name: Deploy Ingress NGINX Controller
         run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
-      - name: Deploy apps
-        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
+#      - name: Deploy apps
+#        run: kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
 
       - name: Install integration test dependencies
         run: |
