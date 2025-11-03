@@ -50,13 +50,17 @@ install-ingress-controller:
       --repo https://kubernetes.github.io/ingress-nginx \
       --namespace ingress-nginx --create-namespace
     for i in {1..30}; do \
-      kubectl get pods -l app.kubernetes.io/name=ingress-nginx && \
+      kubectl get pods --namespace ingress-nginx -l app.kubernetes.io/name=ingress-nginx -l app.kubernetes.io/component=controller && \
       break; \
       echo "Waiting for apps to be launched... ($i/30)"; \
       sleep 2; \
     done
     echo "Waiting for apps to be ready:"
-    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=ingress-nginx --timeout=120s
+    kubectl wait --for=condition=Ready pod \
+      -l app.kubernetes.io/name=ingress-nginx \
+      -l app.kubernetes.io/component=controller \
+      --namespace ingress-nginx \
+      --timeout=120s
 
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
