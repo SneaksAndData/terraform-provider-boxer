@@ -39,20 +39,8 @@ wait-for-apps-to-be-ready:
 
 install-ingress-controller:
     helm upgrade --install ingress-nginx ingress-nginx \
-      --repo https://kubernetes.github.io/ingress-nginx \
-      --namespace ingress-nginx --create-namespace
-    for i in {1..30}; do \
-      kubectl get pods --namespace ingress-nginx -l app.kubernetes.io/name=ingress-nginx -l app.kubernetes.io/component=controller && \
-      break; \
-      echo "Waiting for apps to be launched... ($i/30)"; \
-      sleep 2; \
-    done
-    echo "Waiting for apps to be ready:"
-    kubectl wait --for=condition=Ready pod \
-      -l app.kubernetes.io/name=ingress-nginx \
-      -l app.kubernetes.io/component=controller \
-      --namespace ingress-nginx \
-      --timeout=120s
+      --repo https://kubernetes.github.io/ingress-nginx
+    kubectl rollout status deployment/ingress-nginx-controller --timeout=180s
 
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
