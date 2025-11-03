@@ -31,7 +31,7 @@ jobs:
       - name: Get logs from application pods
         if: always()
         run: |
-          kubectl get pods --all-namespaces 
+          kubectl describe pods --namespace default || true
           kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
           kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
 
