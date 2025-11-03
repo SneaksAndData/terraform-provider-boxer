@@ -28,13 +28,12 @@ jobs:
       - name: Setup integration tests
         run: just up
 
-      #      - name: Get logs from application pods
-#        if: always()
-#        run: |
-#          kubectl logs -l app=foo || true
-#          kubectl logs -l app=bar || true
-#          kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
-#          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
+      - name: Get logs from application pods
+        if: always()
+        run: |
+          kubectl get pods --all-namespaces 
+          kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
+          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
 
       - name: Check Format
         run: gofmt -d ./
