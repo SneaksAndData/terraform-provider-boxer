@@ -2,17 +2,15 @@ default:
   @just --list
 
 up: start-kind-cluster \
-deploy-ingress-nginx-controller \
 build-deps \
 install-boxer \
 wait-for-apps-to-be-ready \
+install-ingress-controller \
 create-ingress
 
-fresh: stop-kind-cluster up
+fresh: stop up
 
-stop: stop-kind-cluster
-
-stop-kind-cluster:
+stop:
     kind delete cluster --name kind
 
 start-kind-cluster:
@@ -22,9 +20,6 @@ check-kind-cluster:
     kubectl cluster-info
     kubectl get nodes
     kind get kubeconfig --name kind
-
-deploy-ingress-nginx-controller:
-    kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
 build-deps:
     helm dependency build ./integration_tests/helm/setup
@@ -39,8 +34,29 @@ install-boxer:
       --set boxer-validator-nginx.validator.replicas=1
 
 wait-for-apps-to-be-ready:
+    for i in {1..30}; do \
+      kubectl get pods -l app.kubernetes.io/name=boxer-issuer && \
+      kubectl get pods -l app.kubernetes.io/name=boxer-validator-nginx && \
+      break; \
+      echo "Waiting for apps to be launched... ($i/30)"; \
+      sleep 2; \
+    done
+    echo "Waiting for apps to be ready:"
     kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-issuer --timeout=120s
     kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-validator-nginx --timeout=120s
+
+install-ingress-controller:
+    helm upgrade --install ingress-nginx ingress-nginx \
+      --repo https://kubernetes.github.io/ingress-nginx \
+      --namespace ingress-nginx --create-namespace
+    for i in {1..30}; do \
+      kubectl get pods -l app.kubernetes.io/name=ingress-nginx && \
+      break; \
+      echo "Waiting for apps to be launched... ($i/30)"; \
+      sleep 2; \
+    done
+    echo "Waiting for apps to be ready:"
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=ingress-nginx --timeout=120s
 
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
