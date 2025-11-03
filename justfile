@@ -34,17 +34,8 @@ install-boxer:
       --set boxer-validator-nginx.validator.replicas=1
 
 wait-for-apps-to-be-ready:
-    for i in {1..30}; do \
-      if kubectl get pods -l app.kubernetes.io/name=boxer-issuer -o name | grep -q . && \
-         kubectl get pods -l app.kubernetes.io/name=boxer-validator-nginx -o name | grep -q .; then \
-        break; \
-      fi; \
-      echo "Waiting for apps to be launched... ($i/30)"; \
-      sleep 2; \
-    done; \
-    echo "Waiting for apps to be ready:"; \
-    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-issuer --timeout=120s; \
-    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=boxer-validator-nginx --timeout=120s
+    kubectl rollout status deployment/boxer-issuer --timeout=180s
+    kubectl rollout status deployment/boxer-validator-nginx --timeout=180s
 
 install-ingress-controller:
     helm upgrade --install ingress-nginx ingress-nginx \
