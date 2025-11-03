@@ -33,7 +33,9 @@ jobs:
         if: always()
         run: |
           kubectl describe pods --namespace default || true
+          echo "============================= Logs from boxer-issuer =================================================="
           kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
+          echo "============================= Logs from boxer-validator-nginx =-======================================="
           kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
 
       - name: Check Format
