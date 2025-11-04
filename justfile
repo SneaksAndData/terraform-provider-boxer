@@ -4,8 +4,8 @@ default:
 up: start-kind-cluster \
 build-deps \
 install-boxer \
-wait-for-apps-to-be-ready \
 install-ingress-controller \
+wait-for-services \
 create-ingress
 
 fresh: stop up
@@ -33,14 +33,13 @@ install-boxer:
       --set 'boxer-validator-nginx.validator.config.listenIp=0.0.0.0' \
       --set boxer-validator-nginx.validator.replicas=1
 
-wait-for-apps-to-be-ready:
+wait-for-services:
     kubectl rollout status deployment/boxer-issuer --timeout=180s
     kubectl rollout status deployment/boxer-validator-nginx --timeout=180s
+    kubectl rollout status deployment/ingress-nginx-controller --namespace ingress-nginx --timeout=180s
 
 install-ingress-controller:
-    helm upgrade --install ingress-nginx ingress-nginx \
-      --repo https://kubernetes.github.io/ingress-nginx
-    kubectl rollout status deployment/ingress-nginx-controller --timeout=180s
+    kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
