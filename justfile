@@ -7,7 +7,8 @@ build-deps \
 install-boxer \
 install-ingress-controller \
 wait-for-services \
-create-ingress
+create-ingress \
+bootstrap
 
 fresh: stop up
 
@@ -25,13 +26,18 @@ check-kind-cluster:
 build-deps:
     helm dependency build ./integration_tests/helm/setup
 
+# Also todo: extra segments in path should fail
+
 key := `openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
 install-boxer:
     helm upgrade --install --namespace default integration-tests integration_tests/helm/setup \
       --set boxer-issuer.issuer.replicas=1 \
       --set-literal 'boxer-validator-nginx.validator.config.tokenSettings.keys={"default": "{{key}}"}' \
       --set 'boxer-issuer.issuer.config.listenIp=0.0.0.0' \
+      --set 'boxer-issuer.issuer.config.logLevel=debug' \
+      --set 'boxer-issuer.issuer.config.backend.kubernetes.resourceOwnerLabel=application/boxer-issuer' \
       --set 'boxer-validator-nginx.validator.config.listenIp=0.0.0.0' \
+      --set 'boxer-validator-nginx.validator.config.backend.kubernetes.resourceOwnerLabel=application/boxer-validator-nginx' \
       --set boxer-validator-nginx.validator.replicas=1
 
 wait-for-services:
@@ -47,3 +53,9 @@ create-ingress:
 
 configure-rbac: # see:  https://github.com/kubernetes/kubernetes/issues/130781 for details
     kubectl apply -f ./integration_tests/rbac.yaml
+
+bootstrap:
+    kubectl apply -f ./integration_tests/bootstrap/bootstrap.yaml
+
+## Check: run this command in the boxer-issuer container to verify
+## curl -H "Authorization: Bearer your_token" http://localhost/api/v1/identity_provider/oidc/rooatr/oidc/root

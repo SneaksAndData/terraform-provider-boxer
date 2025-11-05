@@ -3,30 +3,30 @@ apiVersion: auth.sneaksanddata.com/v1beta1
 kind: IdentityProviderDocument
 metadata:
   labels:
-    local.debug: integration-tests
+    application/boxer-issuer: integration-tests
   name: root
   namespace: default
 spec:
   active: true
   oidc:
     audiences:
-      - account
-    discoveryUrl: http://localhost:8080/realms/master/
+      - https://kubernetes.default.svc.cluster.local
+    discoveryUrl: https://kubernetes.default.svc.cluster.local
     issuers:
-      - http://localhost:8080/realms/master
-    userIdClaim: preferred_username
+      - https://kubernetes.default.svc.cluster.local
+    userIdClaim: sub
 ---
 apiVersion: auth.sneaksanddata.com/v1beta1
 kind: ExternalIdentityDocument
 metadata:
   labels:
-    local.debug: integration-tests
-  name: keycloak-test-root
+    application/boxer-issuer: integration-tests
+  name: root-root
   namespace: default
 spec:
   active: true
-  id: test_root
-  identityProvider: keycloak
+  id: root
+  identityProvider: root
   principalRef:
     principal: PhotoApp::User::"root"
     schema: root-issuer
@@ -36,7 +36,7 @@ apiVersion: auth.sneaksanddata.com/v1beta1
 kind: CedarEntityDocument
 metadata:
   labels:
-    local.debug: integration-tests
+    application/boxer-issuer: integration-tests
   name: root-issuer-root-photoapp
   namespace: default
 spec:
@@ -56,7 +56,7 @@ apiVersion: auth.sneaksanddata.com/v1beta1
 kind: SchemaDocument
 metadata:
   labels:
-    local.debug: integration-tests
+    application/boxer-issuer: integration-tests
   name: root-issuer
   namespace: default
 spec:
