@@ -2,6 +2,7 @@ default:
   @just --list
 
 up: start-kind-cluster \
+configure-rbac \
 build-deps \
 install-boxer \
 install-ingress-controller \
@@ -43,3 +44,6 @@ install-ingress-controller:
 
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
+
+configure-rbac: # see:  https://github.com/kubernetes/kubernetes/issues/130781 for details
+    kubectl apply -f ./integration_tests/rbac.yaml
