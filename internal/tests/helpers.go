@@ -23,7 +23,7 @@ func getExternalToken(services *Services) string {
 	form.Add("password", services.ExternalIdp.Credentials.Password)
 	form.Add("grant_type", services.ExternalIdp.Credentials.GrantType)
 
-	endpoint := fmt.Sprintf("%s/auth/realms/master/protocol/openid-connect/token", services.ExternalIdp.Endpoint)
+	endpoint := fmt.Sprintf("%s/realms/master/protocol/openid-connect/token", services.ExternalIdp.Endpoint)
 	resp, err := http.PostForm(endpoint, form)
 	if err != nil {
 		panic(err)
@@ -42,6 +42,9 @@ func getExternalToken(services *Services) string {
 	var tr tokenResponse
 	if err := json.Unmarshal(body, &tr); err != nil {
 		panic(err)
+	}
+	if tr.AccessToken == "" {
+		panic("failed to obtain access token from external identity provider")
 	}
 	return tr.AccessToken
 }

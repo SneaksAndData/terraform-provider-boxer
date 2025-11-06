@@ -69,5 +69,6 @@ func testAccExampleResource(testContext *TestContext) string {
 	if err != nil {
 		panic(err)
 	}
-	return buf.String()
+	result := buf.String()
+	return result
 }
