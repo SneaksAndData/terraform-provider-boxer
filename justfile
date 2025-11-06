@@ -2,10 +2,10 @@ default:
   @just --list
 
 up: start-kind-cluster \
-configure-rbac \
 build-deps \
 install-boxer \
 install-ingress-controller \
+instll-keycloak \
 wait-for-services \
 create-ingress \
 bootstrap
@@ -43,6 +43,7 @@ install-boxer:
 wait-for-services:
     kubectl rollout status deployment/boxer-issuer --timeout=180s
     kubectl rollout status deployment/boxer-validator-nginx --timeout=180s
+    kubectl rollout status statefulset/keycloak-keycloakx --timeout=180s
     kubectl rollout status deployment/ingress-nginx-controller --namespace ingress-nginx --timeout=180s
 
 install-ingress-controller:
@@ -51,11 +52,22 @@ install-ingress-controller:
 create-ingress:
     kubectl apply -f ./integration_tests/ingress.yaml
 
-configure-rbac: # see:  https://github.com/kubernetes/kubernetes/issues/130781 for details
-    kubectl apply -f ./integration_tests/rbac.yaml
-
 bootstrap:
     kubectl apply -f ./integration_tests/bootstrap/bootstrap.yaml
 
 ## Check: run this command in the boxer-issuer container to verify
 ## curl -H "Authorization: Bearer your_token" http://localhost/api/v1/identity_provider/oidc/rooatr/oidc/root
+
+instll-keycloak:
+    helm upgrade --install keycloak oci://ghcr.io/codecentric/helm-charts/keycloakx \
+      --set keycloak.username=admin \
+      --set keycloak.password=admin \
+      --values ./integration_tests/keycloak.yaml
+
+configure-keycloak:
+    docker run --rm --network=host -v $(pwd)/integration_tests/terraform/keycloak:/tofu --workdir /tofu \
+      ghcr.io/opentofu/opentofu:latest init
+    docker run --rm --network=host -v $(pwd)/integration_tests/terraform/keycloak:/tofu --workdir /tofu \
+      ghcr.io/opentofu/opentofu:latest plan
+    docker run --rm --network=host -v $(pwd)/integration_tests/terraform/keycloak:/tofu --workdir /tofu \
+      ghcr.io/opentofu/opentofu:latest apply -auto-approve
