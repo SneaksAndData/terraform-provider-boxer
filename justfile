@@ -40,9 +40,9 @@ install-boxer:
       --set boxer-validator-nginx.validator.replicas=1
 
 wait-for-services:
+    kubectl rollout status statefulset/keycloak-keycloakx --timeout=180s
     kubectl rollout status deployment/boxer-issuer --timeout=180s
     kubectl rollout status deployment/boxer-validator-nginx --timeout=180s
-    kubectl rollout status statefulset/keycloak-keycloakx --timeout=180s
     kubectl rollout status deployment/ingress-nginx-controller --namespace ingress-nginx --timeout=180s
 
 install-ingress-controller:
@@ -64,6 +64,10 @@ instll-keycloak:
       --values ./integration_tests/keycloak.yaml
 
 configure-keycloak:
+    # Wait a bit for Keycloak to be ready to accept admin commands
+    sleep 10 \
+
+    # Create realm, client, and user for tests
     docker run --rm --network=host -v $(pwd)/integration_tests/terraform/keycloak:/tofu --workdir /tofu \
       ghcr.io/opentofu/opentofu:latest init
     docker run --rm --network=host -v $(pwd)/integration_tests/terraform/keycloak:/tofu --workdir /tofu \
