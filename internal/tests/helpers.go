@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"io"
@@ -14,15 +15,16 @@ type tokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-func getExternalToken() string {
+func getExternalToken(services *Services) string {
 	form := url.Values{}
-	form.Add("client_id", "test_client")
-	form.Add("client_secret", "test_client_secret")
-	form.Add("username", "test_root")
-	form.Add("password", "test-root-password")
-	form.Add("grant_type", "password")
+	form.Add("client_id", services.ExternalIdp.Credentials.ClientID)
+	form.Add("client_secret", services.ExternalIdp.Credentials.ClientSecret)
+	form.Add("username", services.ExternalIdp.Credentials.Username)
+	form.Add("password", services.ExternalIdp.Credentials.Password)
+	form.Add("grant_type", services.ExternalIdp.Credentials.GrantType)
 
-	resp, err := http.PostForm("http://localhost:5555/auth/realms/master/protocol/openid-connect/token", form)
+	endpoint := fmt.Sprintf("%s/auth/realms/master/protocol/openid-connect/token", services.ExternalIdp.Endpoint)
+	resp, err := http.PostForm(endpoint, form)
 	if err != nil {
 		panic(err)
 	}

@@ -1,23 +1,25 @@
 package tests
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
+	"html/template"
 	"testing"
 )
 
 func TestAccExampleWidget_basic(t *testing.T) {
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	token := getExternalToken()
+	services := NewLocalServices()
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: protoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccExampleResource(token, randomName),
+				Config: testAccExampleResource(NewTestContext(randomName, services)),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
@@ -32,7 +34,7 @@ func TestAccExampleWidget_basic(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
 						tfjsonpath.New("discovery_url"),
-						knownvalue.StringExact("http://localhost:8080/realms/master/"),
+						knownvalue.StringExact(services.ExternalIdp.ClusterEndpoint),
 					),
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
@@ -42,7 +44,7 @@ func TestAccExampleWidget_basic(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
 						tfjsonpath.New("issuers"),
-						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("http://localhost:8080/realms/master")}),
+						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact(services.ExternalIdp.Endpoint)}),
 					),
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
@@ -55,33 +57,17 @@ func TestAccExampleWidget_basic(t *testing.T) {
 	})
 }
 
-func testAccExampleResource(token string, name string) string {
-	configurationTemplate := `
-provider "boxer" {
+func testAccExampleResource(testContext *TestContext) string {
+	tpl, err := template.New("configuration").ParseFiles("templates/identity_provider.tmpl")
+	if err != nil {
+		panic(err)
+	}
 
-  external_auth = {
-    security_token = "%s"
-    identity_provider_id = "keycloak"
-    internal_token_provider_endpoint = "http://localhost:5555/issuer"
-  }
-
-  issuer_host    = "http://localhost:5555/issuer"
-  validator_host = "http://localhost:5555/validator"
-}
-
-resource "boxer_identity_provider" "example" {
-  id = "%s"
-  user_id_claim = "preferred_username"
-  discovery_url = "http://localhost:8080/realms/master/"
-  issuers = [
-    "http://localhost:8080/realms/master",
-  ]
-  audiences = [
-    "account"
-  ]
-}
-`
-
-	return fmt.Sprintf(configurationTemplate, token, name)
-
+	fmt.Println("Generating test configuration...")
+	var buf bytes.Buffer
+	err = tpl.ExecuteTemplate(&buf, "identity_provider.tmpl", testContext)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
 }
