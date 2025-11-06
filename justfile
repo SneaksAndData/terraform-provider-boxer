@@ -8,6 +8,7 @@ install-ingress-controller \
 instll-keycloak \
 wait-for-services \
 create-ingress \
+configure-keycloak \
 bootstrap
 
 fresh: stop up

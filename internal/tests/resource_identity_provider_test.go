@@ -1,10 +1,15 @@
 package tests
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"io"
+	"net/http"
+	"net/url"
 	"terraform-provider-boxer/internal"
 	"testing"
 )
@@ -19,13 +24,14 @@ func TestAccExampleWidget_basic(t *testing.T) {
 			return providerFactory(), nil
 		},
 	}
+	token := getToken()
 	resource.Test(t, resource.TestCase{
 		//PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: protoV6ProviderFactories,
 		//CheckDestroy:             testAccCheckExampleResourceDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccExampleResource(rName),
+				Config: testAccExampleResource(token, rName),
 				//ConfigStateChecks: []statecheck.StateCheck{
 				//	stateCheckExampleResourceExists("example_widget.foo", &widgetBefore),
 				//},
@@ -40,14 +46,47 @@ func TestAccExampleWidget_basic(t *testing.T) {
 	})
 }
 
-func testAccExampleResource(name string) string {
-	return `
+type tokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
 
+func getToken() string {
+	form := url.Values{}
+	form.Add("client_id", "test_client")
+	form.Add("client_secret", "test_client_secret")
+	form.Add("username", "test_root")
+	form.Add("password", "test-root-password")
+	form.Add("grant_type", "password")
+
+	resp, err := http.PostForm("http://localhost:5555/auth/realms/master/protocol/openid-connect/token", form)
+	if err != nil {
+		panic(err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	var tr tokenResponse
+	if err := json.Unmarshal(body, &tr); err != nil {
+		panic(err)
+	}
+	return tr.AccessToken
+}
+
+func testAccExampleResource(token string, name string) string {
+	configurationTemplate := `
 provider "boxer" {
 
   external_auth = {
-    security_token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImoyaHM1VnJpQ09RX0dJelBsVVBRV2trbjZCa2FDMng5RkFoWWZLblJNeFkifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiXSwiZXhwIjoxNzYyMzU2Mzk1LCJpYXQiOjE3NjIzNTI3OTUsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwianRpIjoiYjQzOWMyZjYtNTBhYS00ZTVhLWJiZGYtY2ViN2JkNTU2MGUyIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJkZWZhdWx0Iiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImludGVncmF0aW9uLXRlc3RzLWJveGVyLWlzc3VlciIsInVpZCI6IjI4OGJhMjc4LTQ3ZTktNDBkOC1hZWZhLTA1ZjhmNzNiODRlOSJ9fSwibmJmIjoxNzYyMzUyNzk1LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDppbnRlZ3JhdGlvbi10ZXN0cy1ib3hlci1pc3N1ZXIifQ.iatWjutuU1atsJLpfdz9Cg5QY9vduIsbjH7nsBwm_ENFWa8sZ_caFGEpac30QWQpE8_mK3TQow7A2ez6hgbrJhmYI14Y75KKuw4rUteYZ9i1-PkK5wSNYRQxbO2-fYjkvvYYzvzUom0GirrN8Myi_gC-9mABl6yzJrG8msBgn0cRpz0siLdPyNUK6wdJe8PJl2ubLlVArKzpmvVuQZLQun4qdnH5BGzwOlnCCvKrJK2G6TfEUEATzkbQ7XjVQLnqxsF1LmJm0840WP_D8nXMnODTsGPge1S2UdzW2ys-lqSFDYEJSxrHTeexqBS3RdLhIdl_kZbaV0N31W31amwQ3g"
-    identity_provider_id = "root"
+    security_token = "%s"
+    identity_provider_id = "keycloak"
     internal_token_provider_endpoint = "http://localhost:5555/issuer"
   }
 
@@ -56,7 +95,7 @@ provider "boxer" {
 }
 
 resource "boxer_identity_provider" "example" {
-  id = "provider"
+  id = "%s"
   user_id_claim = "preferred_username"
   discovery_url = "http://localhost:8080/realms/master/"
   issuers = [
@@ -67,6 +106,8 @@ resource "boxer_identity_provider" "example" {
   ]
 }
 `
+
+	return fmt.Sprintf(configurationTemplate, token, name)
 
 }
 
