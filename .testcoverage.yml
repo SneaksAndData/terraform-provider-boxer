@@ -1,0 +1,12 @@
+profile: cover.out
+
+local-prefix: terraform-provider-boxer
+
+threshold:
+  file: 70
+  package: 70
+  total: 75
+
+exclude:
+  paths:
+    - ^pkg/generated # exclude generated code
