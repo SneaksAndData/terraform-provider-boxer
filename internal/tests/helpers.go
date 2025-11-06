@@ -15,7 +15,7 @@ type tokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-func getExternalToken(services *Services) string {
+func getExternalToken(services *Services) (string, error) {
 	form := url.Values{}
 	form.Add("client_id", services.ExternalIdp.Credentials.ClientID)
 	form.Add("client_secret", services.ExternalIdp.Credentials.ClientSecret)
@@ -26,7 +26,7 @@ func getExternalToken(services *Services) string {
 	endpoint := fmt.Sprintf("%s/realms/master/protocol/openid-connect/token", services.ExternalIdp.Endpoint)
 	resp, err := http.PostForm(endpoint, form)
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("failed get token from external identity provider: %w", err)
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -37,16 +37,16 @@ func getExternalToken(services *Services) string {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 	var tr tokenResponse
 	if err := json.Unmarshal(body, &tr); err != nil {
-		panic(err)
+		return "", fmt.Errorf("failed to unmapshal response: %w", err)
 	}
 	if tr.AccessToken == "" {
-		panic("failed to obtain access token from external identity provider")
+		return "", fmt.Errorf("got empty token in response: %s", body)
 	}
-	return tr.AccessToken
+	return tr.AccessToken, nil
 }
 
 func providerFactory() tfprotov6.ProviderServer {

@@ -15,11 +15,15 @@ import (
 func TestAccExampleWidget_basic(t *testing.T) {
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := NewLocalServices()
+	token, err := getExternalToken(services)
+	if err != nil {
+		t.Fatalf("failed to get external token: %s", err)
+	}
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: protoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccExampleResource(NewTestContext(randomName, services)),
+				Config: testAccExampleResource(NewTestContext(randomName, services, token)),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",

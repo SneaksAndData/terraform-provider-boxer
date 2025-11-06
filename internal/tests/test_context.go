@@ -8,8 +8,7 @@ type TestContext struct {
 }
 
 // NewTestContext creates a new TestContext with default values.
-func NewTestContext(objectName string, services *Services) *TestContext {
-	token := getExternalToken(services)
+func NewTestContext(objectName string, services *Services, token string) *TestContext {
 
 	return &TestContext{
 		Services:   services,
