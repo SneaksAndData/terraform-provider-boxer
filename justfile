@@ -27,8 +27,6 @@ check-kind-cluster:
 build-deps:
     helm dependency build ./integration_tests/helm/setup
 
-# Also todo: extra segments in path should fail
-
 key := `openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
 install-boxer:
     helm upgrade --install --namespace default integration-tests integration_tests/helm/setup \

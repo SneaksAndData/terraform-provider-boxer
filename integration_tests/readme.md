@@ -1,4 +1,4 @@
-# Running the integration tests manually
+# Run the tests manually (getting the internal token and checking it)
 
 1. Start the Keycloak server:
 ```bash
@@ -38,12 +38,3 @@ curl -v -X 'GET' 'http://localhost:8081/token/review' \
   -H "Authorization: Bearer $INTERNAL_TOKEN"
   
 ```
-
-
-active: true
-oidc:
-audiences:
-- account
-discoveryUrl: http://keycloak-keycloakx-http/auth/realms/master/
-issuers:
-- http://localhost:5555/auth/realms/master
