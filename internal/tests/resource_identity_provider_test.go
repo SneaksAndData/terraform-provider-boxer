@@ -1,83 +1,58 @@
 package tests
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"io"
-	"net/http"
-	"net/url"
-	"terraform-provider-boxer/internal"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/statecheck"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 	"testing"
 )
 
 func TestAccExampleWidget_basic(t *testing.T) {
-
-	//var idpBefore, idpAfter identityProviderResource
-	rName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-
-	protoV6ProviderFactories := map[string]func() (tfprotov6.ProviderServer, error){
-		"boxer": func() (tfprotov6.ProviderServer, error) {
-			return providerFactory(), nil
-		},
-	}
-	token := getToken()
+	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
+	token := getExternalToken()
 	resource.Test(t, resource.TestCase{
-		//PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: protoV6ProviderFactories,
-		//CheckDestroy:             testAccCheckExampleResourceDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccExampleResource(token, rName),
-				//ConfigStateChecks: []statecheck.StateCheck{
-				//	stateCheckExampleResourceExists("example_widget.foo", &widgetBefore),
-				//},
+				Config: testAccExampleResource(token, randomName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("id"),
+						knownvalue.StringExact(randomName),
+					),
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("name"),
+						knownvalue.Null(),
+					),
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("discovery_url"),
+						knownvalue.StringExact("http://localhost:8080/realms/master/"),
+					),
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("user_id_claim"),
+						knownvalue.StringExact("preferred_username"),
+					),
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("issuers"),
+						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("http://localhost:8080/realms/master")}),
+					),
+					statecheck.ExpectKnownValue(
+						"boxer_identity_provider.example",
+						tfjsonpath.New("audiences"),
+						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("account")}),
+					),
+				},
 			},
-			//{
-			//	Config: testAccExampleResource_removedPolicy(rName),
-			//	ConfigStateChecks: []statecheck.StateCheck{
-			//		stateCheckExampleResourceExists("example_widget.foo", &widgetAfter),
-			//	},
-			//},
 		},
 	})
-}
-
-type tokenResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-func getToken() string {
-	form := url.Values{}
-	form.Add("client_id", "test_client")
-	form.Add("client_secret", "test_client_secret")
-	form.Add("username", "test_root")
-	form.Add("password", "test-root-password")
-	form.Add("grant_type", "password")
-
-	resp, err := http.PostForm("http://localhost:5555/auth/realms/master/protocol/openid-connect/token", form)
-	if err != nil {
-		panic(err)
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(resp.Body)
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	var tr tokenResponse
-	if err := json.Unmarshal(body, &tr); err != nil {
-		panic(err)
-	}
-	return tr.AccessToken
 }
 
 func testAccExampleResource(token string, name string) string {
@@ -109,9 +84,4 @@ resource "boxer_identity_provider" "example" {
 
 	return fmt.Sprintf(configurationTemplate, token, name)
 
-}
-
-func providerFactory() tfprotov6.ProviderServer {
-	p, _ := providerserver.NewProtocol6WithError(internal.BoxerProvider{})()
-	return p
 }
