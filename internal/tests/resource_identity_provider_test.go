@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestAccExampleWidget_basic(t *testing.T) {
+func TestIdentityProvider_creation(t *testing.T) {
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := NewLocalServices()
 	token, err := getExternalToken(services)
