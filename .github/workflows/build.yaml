@@ -29,15 +29,6 @@ jobs:
       - name: Setup integration tests
         run: just up
 
-      - name: Get logs from application pods
-        if: always()
-        run: |
-          kubectl describe pods --namespace default || true
-          echo "============================= Logs from boxer-issuer =================================================="
-          kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
-          echo "============================= Logs from boxer-validator-nginx =-======================================="
-          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
-
       - name: Check Format
         run: gofmt -d ./
 
@@ -60,3 +51,13 @@ jobs:
 
       - name: Build
         run: TF_ACC=1 go test -v ./...
+
+      - name: Get logs from application pods
+        if: always()
+        run: |
+          kubectl describe pods --namespace default || true
+          echo "============================= Logs from boxer-issuer =================================================="
+          kubectl logs -l app.kubernetes.io/name=boxer-issuer || true
+          echo "============================= Logs from boxer-validator-nginx =-======================================="
+          kubectl logs -l app.kubernetes.io/name=boxer-validator-nginx || true
+
