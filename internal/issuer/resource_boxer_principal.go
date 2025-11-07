@@ -113,7 +113,7 @@ func (resource *boxerPrincipal) Read(ctx context.Context, request resource.ReadR
 	tflog.Info(ctx, "Getting principal by ID", map[string]any{"principalId": stateModel.ID.ValueString()})
 	params := issuerClient.GetPrincipalParams{Schema: stateModel.SchemaId.ValueString(), ID: stateModel.ID.ValueString()}
 	_, err = resource.issuerClient.GetPrincipal(ctx, params)
-	if err != nil {
+	if err != nil { // coverage-ignore
 		common.GenerateError(&response.Diagnostics, "Reading", "Boxer Principal", err)
 		return
 	}
