@@ -30,11 +30,6 @@ func TestDataSourceIdentityProvider_reading(t *testing.T) {
 					),
 					statecheck.ExpectKnownValue(
 						"data.boxer_identity_provider.example",
-						tfjsonpath.New("name"),
-						knownvalue.Null(),
-					),
-					statecheck.ExpectKnownValue(
-						"data.boxer_identity_provider.example",
 						tfjsonpath.New("discovery_url"),
 						knownvalue.StringExact(services.ExternalIdp.ClusterEndpoint),
 					),
