@@ -5,7 +5,7 @@ local-prefix: terraform-provider-boxer
 threshold:
   file: 70
   package: 70
-  total: 75
+  total: 80
 
 exclude:
   paths:
