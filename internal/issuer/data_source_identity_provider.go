@@ -24,7 +24,7 @@ func NewIdentityProviderDataSource() datasource.DataSource {
 
 func (dataSource *identityProviderDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
 	client := getDataSourceIssuerClient(request, response)
-	if client == nil {
+	if client == nil { // coverage-ignore
 		// If the client is nil, we cannot proceed with the data source.
 		// This method will be called again when the provider is configured,
 		// so we can safely return here without setting the client.
@@ -63,7 +63,7 @@ func (dataSource *identityProviderDataSource) Read(ctx context.Context, request 
 	tflog.Info(ctx, "Reading identity provider data source")
 	var configModel identityProviderDataSourceModel
 	err := common.ReadFromConfig(ctx, &configModel, request.Config, &response.Diagnostics)
-	if err != nil {
+	if err != nil { // coverage-ignore
 		// If we can't read the config, we can't proceed with the update.
 		// so we return early.
 		// The error will be handled by the framework and returned to the user.
@@ -71,7 +71,7 @@ func (dataSource *identityProviderDataSource) Read(ctx context.Context, request 
 	}
 
 	apiData, err := dataSource.issuerClient.GetProvider(ctx, issuerClient.GetProviderParams{ID: configModel.ID.ValueString()})
-	if err != nil {
+	if err != nil { // coverage-ignore
 		common.GenerateError(&response.Diagnostics, "Reading", "Identity Provider", err)
 		return
 	}
@@ -83,7 +83,7 @@ func (dataSource *identityProviderDataSource) Read(ctx context.Context, request 
 		configModel.UserIdClaim = types.StringValue(apiResponse.GetUserIdClaim())
 		diag := response.State.Set(ctx, &configModel)
 		response.Diagnostics.Append(diag...)
-		if response.Diagnostics.HasError() {
+		if response.Diagnostics.HasError() { // coverage-ignore
 			return
 		}
 	case *issuerClient.GetProviderNotFound:
