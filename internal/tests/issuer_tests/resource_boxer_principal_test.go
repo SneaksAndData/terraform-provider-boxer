@@ -27,7 +27,7 @@ func TestResourceBoxerPrincipal_creation(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"boxer_principal.example",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact(randomName),
+						knownvalue.StringExact("PhotoApp::User::\"alice\""),
 					),
 					assertions.ValidateEntityIsParseable("boxer_principal.example"),
 				},

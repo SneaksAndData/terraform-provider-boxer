@@ -27,7 +27,7 @@ func TestDataSourceCedarSchema_reading(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.boxer_issuer_cedar_schema.example",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact(randomName),
+						knownvalue.StringExact("PhotoApp::User::\"alice\""),
 					),
 					assertions.ValidateSchemaIsParseable("data.boxer_issuer_cedar_schema.example"),
 				},
