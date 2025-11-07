@@ -71,10 +71,11 @@ jobs:
             go-test-coverage report:
             ```${{ fromJSON(steps.coverage.outputs.report) }}```
 
-      # - name: "finally check coverage"
-      #   if: steps.coverage.outcome == 'failure'
-      #   shell: bash
-      #   run: echo "coverage check failed" && exit 1
+      - name: "finally check coverage"
+        # Temporarily disabled until we fix coverage issues
+        if: false && steps.coverage.outcome == 'failure'
+        shell: bash
+        run: echo "coverage check failed" && exit 1
 
       - name: Get logs from application pods
         if: always()

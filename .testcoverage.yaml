@@ -9,4 +9,5 @@ threshold:
 
 exclude:
   paths:
-    - ^pkg/generated # exclude generated code
+    - ^pkg/generated  # exclude generated code
+    - main.go         # application entry point
