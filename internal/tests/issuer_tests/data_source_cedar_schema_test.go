@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestResourceCedarSchema_creation(t *testing.T) {
+func TestDataSourceCedarSchema_reading(t *testing.T) {
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests.NewLocalServices()
 	token, err := tests.GetExternalToken(services)
@@ -22,14 +22,14 @@ func TestResourceCedarSchema_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests.RenderTemplate(tests.NewTestContext(randomName, services, token), "resource_cedar_schema.tmpl"),
+				Config: tests.RenderTemplate(tests.NewTestContext(randomName, services, token), "data_source_cedar_schema.tmpl"),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_issuer_cedar_schema.example",
+						"data.boxer_issuer_cedar_schema.example",
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
-					assertions.ValidateSchemaIsParseable("boxer_issuer_cedar_schema.example"),
+					assertions.ValidateSchemaIsParseable("data.boxer_issuer_cedar_schema.example"),
 				},
 			},
 		},

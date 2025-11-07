@@ -21,7 +21,7 @@ func TestIdentityProvider_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests.RenderTemplate(tests.NewTestContext(randomName, services, token), "identity_provider.tmpl"),
+				Config: tests.RenderTemplate(tests.NewTestContext(randomName, services, token), "resource_identity_provider.tmpl"),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"boxer_identity_provider.example",
