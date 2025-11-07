@@ -2,6 +2,7 @@ package assertions
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/cedar-policy/cedar-go"
 	"github.com/hashicorp/terraform-json"
@@ -59,14 +60,14 @@ func (e *validateEntityIsParseable) CheckState(_ context.Context, req statecheck
 		return
 	}
 
-	unmarshalled := cedar.EntityMap{}
-	err := unmarshalled.UnmarshalJSON([]byte(dataJson))
+	unmarshalled := cedar.Entity{}
+	err := json.Unmarshal([]byte(dataJson), &unmarshalled)
 	if err != nil {
 		resp.Error = fmt.Errorf("failed to parse cedar schema JSON: %w", err)
 		return
 	}
 
-	_, ok := unmarshalled.Get(cedar.NewEntityUID("PhotoApp::User", "alice"))
+	ok := unmarshalled.UID == cedar.NewEntityUID("PhotoApp::User", "alice")
 	if !ok {
 		resp.Error = fmt.Errorf("entity 'PhotoApp::User::\"alice\"' not found in parsed data")
 		return
