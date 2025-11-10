@@ -11,6 +11,8 @@ import (
 )
 
 func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
+	t.Skip("Skipping until Boxer service supports resource discovery documents")
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests.NewLocalServices()
 	token, err := tests.GetExternalToken(services)
@@ -18,7 +20,6 @@ func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get external token: %s", err)
 	}
-	t.Skip("Skipping until Boxer service supports resource discovery documents")
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: tests.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
