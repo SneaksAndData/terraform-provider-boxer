@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestDataSourceBoxerPrincipal_creation(t *testing.T) {
+func TestDataSourceBoxerPrincipal_reading(t *testing.T) {
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests.NewLocalServices()
 	token, err := tests.GetExternalToken(services)
