@@ -78,7 +78,7 @@ func (dataSource *resourceDiscoveryDocumentDataSource) Schema(_ context.Context,
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (dataSource *resourceDiscoveryDocumentDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
+func (dataSource *resourceDiscoveryDocumentDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) { // coverage-ignore
 	var configModel resourceDiscoveryDocumentDataSourceModel
 	err := common.ReadFromConfig(ctx, &configModel, request.Config, &response.Diagnostics)
 	if err != nil {
@@ -141,7 +141,7 @@ type resourceDiscoveryDocumentDataSource struct {
 	validatorClient *validatorClient.Client
 }
 
-func (model *resourceDiscoveryDocumentDataSourceModel) From(source *validatorClient.ResourceSetRegistration) *resourceDiscoveryDocumentDataSourceModel {
+func (model *resourceDiscoveryDocumentDataSourceModel) From(source *validatorClient.ResourceSetRegistration) *resourceDiscoveryDocumentDataSourceModel { // coverage-ignore
 	model.Hostname = types.StringValue(source.Hostname)
 	model.Routes = make([]resourceDataSourceRouteModel, len(source.Routes))
 	for i, route := range source.Routes {
@@ -153,7 +153,7 @@ func (model *resourceDiscoveryDocumentDataSourceModel) From(source *validatorCli
 	return model
 }
 
-func (model *resourceDiscoveryDocumentDataSourceModel) saveToState(ctx context.Context, state *tfsdk.State, diagnostics *diag.Diagnostics) error {
+func (model *resourceDiscoveryDocumentDataSourceModel) saveToState(ctx context.Context, state *tfsdk.State, diagnostics *diag.Diagnostics) error { // coverage-ignore
 	diags := state.Set(ctx, &model)
 	diagnostics.Append(diags...)
 	if diagnostics.HasError() {

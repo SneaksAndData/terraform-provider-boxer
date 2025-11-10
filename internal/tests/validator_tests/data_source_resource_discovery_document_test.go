@@ -11,7 +11,7 @@ import (
 )
 
 func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
-	t.Skip("Skipping until Boxer service supports resource discovery documents")
+	t.Skip("Skipping because of the bug #56")
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests.NewLocalServices()
