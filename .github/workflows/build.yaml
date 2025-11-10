@@ -54,10 +54,7 @@ jobs:
 
       - name: check test coverage
         id: coverage
-        ## Since the official action does not support multi-arch images yet,
-        ## this action temporarily uses an experimental version from my own fork, until this PR is merged:
-        ## https://github.com/vladopajic/go-test-coverage/pull/233
-        uses: s-vitaliy/go-test-coverage@experimental
+        uses: vladopajic/go-test-coverage@v2.18.0
         continue-on-error: true # Should fail after coverage comment is posted
         with:
           config: .testcoverage.yaml
