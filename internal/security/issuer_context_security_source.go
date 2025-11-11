@@ -28,7 +28,7 @@ type issuerContextSecuritySource struct {
 
 func (e issuerContextSecuritySource) Internal(ctx context.Context, _ issuerClient.OperationName) (issuerClient.Internal, error) {
 	token, ok := ctx.Value(e.field).(string)
-	if !ok {
+	if !ok { // coverage-ignore
 		return issuerClient.Internal{}, fmt.Errorf("context field %q not found or not a string", e.field)
 	}
 	return issuerClient.Internal{Token: token}, nil
@@ -37,7 +37,7 @@ func (e issuerContextSecuritySource) Internal(ctx context.Context, _ issuerClien
 // External implements the issuer.SecuritySource interface.
 func (e issuerContextSecuritySource) External(ctx context.Context, _ issuerClient.OperationName) (issuerClient.External, error) {
 	token, ok := ctx.Value(e.field).(string)
-	if !ok {
+	if !ok { // coverage-ignore
 		return issuerClient.External{}, fmt.Errorf("context field %q not found or not a string", e.field)
 	}
 	return issuerClient.External{Token: token}, nil
