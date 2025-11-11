@@ -6,30 +6,33 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	"terraform-provider-boxer/internal/tests"
-	"terraform-provider-boxer/internal/tests/assertions"
+	tests2 "terraform-provider-boxer/tests"
+	assertions2 "terraform-provider-boxer/tests/assertions"
 	"testing"
 )
 
-func TestResourceBoxerPrincipal_creation(t *testing.T) {
+func TestResourceCedarPolicySet_creation(t *testing.T) {
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	services := tests.NewLocalServices()
-	token, err := tests.GetExternalToken(services)
+	services := tests2.NewLocalServices()
+	token, err := tests2.GetExternalToken(services)
+	testContext := tests2.NewTestContext(randomName, services, token)
 	if err != nil {
 		t.Fatalf("failed to get external token: %s", err)
 	}
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: tests.ProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests.RenderTemplate(tests.NewTestContext(randomName, services, token), "resource_boxer_principal.tmpl"),
+				Config: tests2.RenderTemplate(testContext, "resource_policy_set.tmpl.tf"),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_principal.example",
+						"boxer_policy_set.example",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact("PhotoApp::User::\"alice\""),
+						knownvalue.StringExact(randomName),
 					),
-					assertions.ValidateEntityIsParseable("boxer_principal.example"),
+					assertions2.ValidatePolicySetCedarIsParseable("boxer_policy_set.example"),
+					assertions2.ValidatePolicySetJsonIsParseable("boxer_policy_set.example"),
 				},
 			},
 		},

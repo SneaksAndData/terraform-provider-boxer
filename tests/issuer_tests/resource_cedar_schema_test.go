@@ -6,32 +6,30 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	"terraform-provider-boxer/internal/tests"
-	"terraform-provider-boxer/internal/tests/assertions"
+	tests2 "terraform-provider-boxer/tests"
+	"terraform-provider-boxer/tests/assertions"
 	"testing"
 )
 
 func TestResourceCedarSchema_creation(t *testing.T) {
-
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	services := tests.NewLocalServices()
-	token, err := tests.GetExternalToken(services)
-	testContext := tests.NewTestContext(randomName, services, token)
+	services := tests2.NewLocalServices()
+	token, err := tests2.GetExternalToken(services)
 	if err != nil {
 		t.Fatalf("failed to get external token: %s", err)
 	}
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: tests.ProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests.RenderTemplate(testContext, "resource_cedar_schema.tmpl.tf"),
+				Config: tests2.RenderTemplate(tests2.NewTestContext(randomName, services, token), "resource_cedar_schema.tmpl"),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_validator_cedar_schema.example",
+						"boxer_issuer_cedar_schema.example",
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
-					assertions.ValidateSchemaIsParseable("boxer_validator_cedar_schema.example"),
+					assertions.ValidateSchemaIsParseable("boxer_issuer_cedar_schema.example"),
 				},
 			},
 		},
