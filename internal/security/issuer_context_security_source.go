@@ -26,9 +26,9 @@ type issuerContextSecuritySource struct {
 	field ContextKey
 }
 
-func (e issuerContextSecuritySource) Internal(ctx context.Context, _ issuerClient.OperationName) (issuerClient.Internal, error) {
+func (e issuerContextSecuritySource) Internal(ctx context.Context, _ issuerClient.OperationName) (issuerClient.Internal, error) { // coverage-ignore
 	token, ok := ctx.Value(e.field).(string)
-	if !ok { // coverage-ignore
+	if !ok {
 		return issuerClient.Internal{}, fmt.Errorf("context field %q not found or not a string", e.field)
 	}
 	return issuerClient.Internal{Token: token}, nil
