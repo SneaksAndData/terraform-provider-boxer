@@ -12,6 +12,8 @@ import (
 )
 
 func TestDataSourceCedarPolicySet_reading(t *testing.T) {
+	const resourceName = "data.boxer_policy_set.example"
+	const templateName = "data_source_policy_set/data_source_policy_set.tmpl.tf"
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
@@ -24,15 +26,15 @@ func TestDataSourceCedarPolicySet_reading(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "data_source_policy_set.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"data.boxer_policy_set.example",
+						resourceName,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
-					assertions2.ValidatePolicySetCedarIsParseable("data.boxer_policy_set.example"),
-					assertions2.ValidatePolicySetJsonIsParseable("data.boxer_policy_set.example"),
+					assertions2.ValidatePolicySetCedarIsParseable(resourceName),
+					assertions2.ValidatePolicySetJsonIsParseable(resourceName),
 				},
 			},
 		},

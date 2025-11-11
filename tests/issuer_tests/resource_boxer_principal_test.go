@@ -12,6 +12,9 @@ import (
 )
 
 func TestResourceBoxerPrincipal_creation(t *testing.T) {
+	const resourceAddress = "boxer_principal.example"
+	const templateName = "resource_boxer_principal/resource_boxer_principal.tmpl.tf"
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
 	token, err := tests2.GetExternalToken(services)
@@ -22,14 +25,14 @@ func TestResourceBoxerPrincipal_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(tests2.NewTestContext(randomName, services, token), "resource_boxer_principal.tmpl"),
+				Config: tests2.RenderTemplate(tests2.NewTestContext(randomName, services, token), templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_principal.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact("PhotoApp::User::\"alice\""),
 					),
-					assertions.ValidateEntityIsParseable("boxer_principal.example"),
+					assertions.ValidateEntityIsParseable(resourceAddress),
 				},
 			},
 		},

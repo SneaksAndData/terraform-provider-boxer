@@ -12,6 +12,9 @@ import (
 )
 
 func TestDataSourceBoxerExternalIdentity_reading(t *testing.T) {
+	const resourceAddress = "data.boxer_external_identity.example"
+	const templateName = "data_source_boxer_external_identity/data_source_boxer_external_identity.tmpl.tf"
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
 	token, err := tests2.GetExternalToken(services)
@@ -23,30 +26,30 @@ func TestDataSourceBoxerExternalIdentity_reading(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "data_source_boxer_external_identity.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"data.boxer_external_identity.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_external_identity.example",
+						resourceAddress,
 						tfjsonpath.New("identity_provider"),
 						knownvalue.StringExact(randomName),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_external_identity.example",
+						resourceAddress,
 						tfjsonpath.New("principal").AtMapKey("principal_id"),
 						knownvalue.StringExact("PhotoApp::User::\"alice\""),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_external_identity.example",
+						resourceAddress,
 						tfjsonpath.New("principal").AtMapKey("schema_id"),
 						knownvalue.StringExact(fmt.Sprintf("%s-issuer", randomName)),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_external_identity.example",
+						resourceAddress,
 						tfjsonpath.New("validator_schema_id"),
 						knownvalue.StringExact(fmt.Sprintf("%s-validator", randomName)),
 					),

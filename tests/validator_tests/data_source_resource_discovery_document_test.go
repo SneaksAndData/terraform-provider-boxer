@@ -13,6 +13,9 @@ import (
 func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
 	t.Skip("Skipping because of the bug #56")
 
+	const resourceAddress = "data.boxer_resource_discovery_document.example"
+	const templateName = "data_source_resource_discovery_document/data_source_resource_discovery_document.tmpl.tf"
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
 	token, err := tests2.GetExternalToken(services)
@@ -24,20 +27,20 @@ func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "data_source_resource_discovery_document.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"data.boxer_resource_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_resource_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("hostname"),
 						knownvalue.StringExact("www.example.com"),
 					),
 					statecheck.ExpectKnownValue(
-						"data.boxer_resource_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("routes"),
 						knownvalue.ListExact(
 							[]knownvalue.Check{

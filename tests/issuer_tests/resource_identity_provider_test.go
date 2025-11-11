@@ -11,6 +11,9 @@ import (
 )
 
 func TestResourceIdentityProvider_creation(t *testing.T) {
+	const resourceAddress = "boxer_identity_provider.example"
+	const templateName = "resource_identity_provider/resource_identity_provider.tmpl.tf"
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
 	token, err := tests2.GetExternalToken(services)
@@ -21,35 +24,35 @@ func TestResourceIdentityProvider_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(tests2.NewTestContext(randomName, services, token), "resource_identity_provider.tmpl"),
+				Config: tests2.RenderTemplate(tests2.NewTestContext(randomName, services, token), templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("name"),
 						knownvalue.Null(),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("discovery_url"),
 						knownvalue.StringExact(services.ExternalIdp.ClusterEndpoint),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("user_id_claim"),
 						knownvalue.StringExact("preferred_username"),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("issuers"),
 						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact(services.ExternalIdp.Endpoint)}),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_identity_provider.example",
+						resourceAddress,
 						tfjsonpath.New("audiences"),
 						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("account")}),
 					),

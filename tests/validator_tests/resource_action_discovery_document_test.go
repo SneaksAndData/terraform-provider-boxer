@@ -11,6 +11,9 @@ import (
 )
 
 func TestResourceActionDiscoveryDocument_creation(t *testing.T) {
+	const resourceAddress = "boxer_action_discovery_document.example"
+	const templateName = "resource_action_discovery_document/resource_action_discovery_document.tmpl.tf"
+
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
 	token, err := tests2.GetExternalToken(services)
@@ -22,20 +25,20 @@ func TestResourceActionDiscoveryDocument_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "resource_action_discovery_document.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_action_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_action_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("hostname"),
 						knownvalue.StringExact("www.example.com"),
 					),
 					statecheck.ExpectKnownValue(
-						"boxer_action_discovery_document.example",
+						resourceAddress,
 						tfjsonpath.New("routes"),
 						knownvalue.ListExact(
 							[]knownvalue.Check{

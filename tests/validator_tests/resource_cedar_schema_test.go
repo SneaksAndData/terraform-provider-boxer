@@ -12,6 +12,8 @@ import (
 )
 
 func TestResourceCedarSchema_creation(t *testing.T) {
+	const resourceAddress = "boxer_validator_cedar_schema.example"
+	const templateName = "resource_cedar_schema/resource_cedar_schema.tmpl.tf"
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
@@ -24,14 +26,14 @@ func TestResourceCedarSchema_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "resource_cedar_schema.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_validator_cedar_schema.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
-					assertions.ValidateSchemaIsParseable("boxer_validator_cedar_schema.example"),
+					assertions.ValidateSchemaIsParseable(resourceAddress),
 				},
 			},
 		},

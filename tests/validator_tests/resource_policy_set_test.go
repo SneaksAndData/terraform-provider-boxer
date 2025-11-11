@@ -12,6 +12,8 @@ import (
 )
 
 func TestResourceCedarPolicySet_creation(t *testing.T) {
+	const resourceAddress = "boxer_policy_set.example"
+	const templateName = "resource_policy_set/resource_policy_set.tmpl.tf"
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	services := tests2.NewLocalServices()
@@ -24,15 +26,15 @@ func TestResourceCedarPolicySet_creation(t *testing.T) {
 		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, "resource_policy_set.tmpl.tf"),
+				Config: tests2.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"boxer_policy_set.example",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.StringExact(randomName),
 					),
-					assertions2.ValidatePolicySetCedarIsParseable("boxer_policy_set.example"),
-					assertions2.ValidatePolicySetJsonIsParseable("boxer_policy_set.example"),
+					assertions2.ValidatePolicySetCedarIsParseable(resourceAddress),
+					assertions2.ValidatePolicySetJsonIsParseable(resourceAddress),
 				},
 			},
 		},
