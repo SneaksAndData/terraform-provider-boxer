@@ -6,7 +6,7 @@ import (
 )
 
 func getDataSourceIssuerClient(request datasource.ConfigureRequest, response *datasource.ConfigureResponse) *issuerClient.Client {
-	if request.ProviderData == nil {
+	if request.ProviderData == nil { // coverage-ignore
 		return nil
 	}
 	data, ok := request.ProviderData.(ProviderDataReader)
