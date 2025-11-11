@@ -156,14 +156,14 @@ func (r *policySetResource) Read(ctx context.Context, request resource.ReadReque
 	switch apiResponse := apiData.(type) {
 	case *validatorClient.PolicySetRegistration:
 		apiModel, err = apiModel.From(apiResponse)
-		if err != nil {
+		if err != nil { // coverage-ignore
 			common.GenerateError(&response.Diagnostics, "Converting", "Policy Set", err)
 		}
 		err = apiModel.saveToState(ctx, &response.State, &response.Diagnostics)
 		// If we can't save the stateModel, we can't proceed with the update.
 		// so we return early.
 		// The error will be handled by the framework and returned to the user.
-		if err != nil {
+		if err != nil { // coverage-ignore
 			return
 		}
 	case *validatorClient.GetPolicySetNotFound:
@@ -229,7 +229,7 @@ func (r *policySetResource) Delete(ctx context.Context, request resource.DeleteR
 		ID:     stateModel.ID.ValueString(),
 		Schema: stateModel.Schema.ValueString(),
 	})
-	if err != nil {
+	if err != nil { // coverage-ignore
 		common.GenerateError(&response.Diagnostics, "Deleting", "Policy Set", err)
 		return
 	}
