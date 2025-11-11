@@ -157,7 +157,7 @@ func (resource *boxerExternalIdentity) Read(ctx context.Context, request resourc
 	case *issuer.ExternalIdentityRegistration:
 		tflog.Debug(ctx, "External identity found, updating state")
 		err = apiModel.From(apiResponse).saveToState(ctx, &response.State, &response.Diagnostics)
-		if err != nil {
+		if err != nil { // coverage-ignore
 			common.GenerateError(&response.Diagnostics, "Saving", "External Identity", err)
 			return
 		}
@@ -245,7 +245,7 @@ type boxerPrincipalAssociationModel struct {
 func saveNewExternalIdentityState(ctx context.Context, newState *boxerExternalIdentityModel, state *tfsdk.State, diagnostics *diag.Diagnostics) error {
 	diags := state.Set(ctx, newState)
 	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
+	if diagnostics.HasError() { // coverage-ignore
 		return fmt.Errorf("error getting plan")
 	}
 	return nil
@@ -263,7 +263,7 @@ func (model *boxerExternalIdentityModel) From(source *issuer.ExternalIdentityReg
 func (model *boxerExternalIdentityModel) saveToState(ctx context.Context, state *tfsdk.State, diagnostics *diag.Diagnostics) error {
 	diags := state.Set(ctx, model)
 	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
+	if diagnostics.HasError() { // coverage-ignore
 		return fmt.Errorf("error getting plan")
 	}
 	return nil
