@@ -14,6 +14,9 @@ import (
 	"text/template"
 )
 
+// Set to true to enable extended logging of generated configurations
+const extendedLoggingEnabled = false
+
 type tokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
@@ -79,6 +82,8 @@ func RenderTemplate(testContext *TestContext, fileName string) string {
 		panic(err)
 	}
 	result := buf.String()
-	fmt.Println(result)
+	if extendedLoggingEnabled {
+		fmt.Println(result)
+	}
 	return result
 }
