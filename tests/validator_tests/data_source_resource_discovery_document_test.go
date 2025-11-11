@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	tests2 "terraform-provider-boxer/tests"
+	helpers "terraform-provider-boxer/tests"
 	"testing"
 )
 
@@ -17,17 +17,17 @@ func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
 	const templateName = "data_source_resource_discovery_document/data_source_resource_discovery_document.tmpl.tf"
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	services := tests2.NewLocalServices()
-	token, err := tests2.GetExternalToken(services)
-	testContext := tests2.NewTestContext(randomName, services, token)
+	services := helpers.NewLocalServices()
+	token, err := helpers.GetExternalToken(services)
+	testContext := helpers.NewTestContext(randomName, services, token)
 	if err != nil {
 		t.Fatalf("failed to get external token: %s", err)
 	}
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: tests2.ProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: helpers.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: tests2.RenderTemplate(testContext, templateName),
+				Config: helpers.RenderTemplate(testContext, templateName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						resourceAddress,
