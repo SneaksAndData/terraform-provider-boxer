@@ -69,8 +69,7 @@ jobs:
             ```${{ fromJSON(steps.coverage.outputs.report) }}```
 
       - name: "finally check coverage"
-        # Temporarily disabled until we fix coverage issues
-        if: false && steps.coverage.outcome == 'failure'
+        if: steps.coverage.outcome == 'failure'
         shell: bash
         run: echo "coverage check failed" && exit 1
 
