@@ -79,5 +79,6 @@ func RenderTemplate(testContext *TestContext, fileName string) string {
 		panic(err)
 	}
 	result := buf.String()
+	fmt.Println(result)
 	return result
 }
