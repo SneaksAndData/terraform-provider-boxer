@@ -75,7 +75,6 @@ func RenderTemplate(testContext *TestContext, fileName string) string {
 	segments := strings.Split(fileName, "/")
 	templateName := strings.Split(fileName, "/")[len(segments)-1:][0]
 
-	fmt.Println("Generating test configuration...")
 	var buf bytes.Buffer
 	err = tpl.ExecuteTemplate(&buf, templateName, testContext)
 	if err != nil {
@@ -83,6 +82,7 @@ func RenderTemplate(testContext *TestContext, fileName string) string {
 	}
 	result := buf.String()
 	if extendedLoggingEnabled {
+		fmt.Println("Generated test configuration:")
 		fmt.Println(result)
 	}
 	return result
