@@ -102,7 +102,7 @@ func (dataSource *boxerExternalIdentityDataSource) Read(ctx context.Context, req
 	case *issuerClient.ExternalIdentityRegistration:
 		tflog.Debug(ctx, "External identity found, updating state")
 		err = apiModel.From(apiResponse).saveToState(ctx, &response.State, &response.Diagnostics)
-		if err != nil {
+		if err != nil { // coverage-ignore
 			common.GenerateError(&response.Diagnostics, "Saving", "Resource Set", err)
 			return
 		}
