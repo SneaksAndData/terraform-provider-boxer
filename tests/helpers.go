@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"terraform-provider-boxer/internal"
 	"text/template"
 )
@@ -62,11 +63,14 @@ var ProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, erro
 	},
 }
 
-func RenderTemplate(testContext *TestContext, templateName string) string {
-	tpl, err := template.New("configuration").ParseFiles(fmt.Sprintf("templates/%s", templateName))
+func RenderTemplate(testContext *TestContext, fileName string) string {
+	tpl, err := template.New("configuration").ParseFiles(fmt.Sprintf("templates/%s", fileName))
 	if err != nil {
 		panic(err)
 	}
+
+	segments := strings.Split(fileName, "/")
+	templateName := strings.Split(fileName, "/")[len(segments)-1:][0]
 
 	fmt.Println("Generating test configuration...")
 	var buf bytes.Buffer
