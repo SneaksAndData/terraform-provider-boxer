@@ -3,15 +3,16 @@ package issuer
 import (
 	"context"
 	"fmt"
+	cedarschema "github.com/cedar-policy/cedar-go/x/exp/schema"
 	"github.com/go-faster/jx"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-boxer/internal/common"
-	"terraform-provider-boxer/pkg/generated/api/issuerClient"
-
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"terraform-provider-boxer/internal/common"
+	"terraform-provider-boxer/pkg/generated/api/issuerClient"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -67,6 +68,15 @@ func (resource *cedarSchemaResource) Create(ctx context.Context, request resourc
 		return
 	}
 
+	// Validate the schema before we Post it
+	var unmarshalled cedarschema.Schema
+	err = unmarshalled.UnmarshalJSON([]byte(planModel.DataJson.ValueString()))
+	if err != nil {
+		// TODO: add error or diagnostics
+		tflog.Error(ctx, fmt.Sprintf("Invalid Schema: %s", err))
+		response.Diagnostics.AddError("Invalid Cedar schema.", fmt.Sprintf("Error: %s", err))
+		return
+	}
 	err = resource.issuerClient.PostSchema(ctx, jx.Raw(planModel.DataJson.ValueString()), issuerClient.PostSchemaParams{ID: planModel.ID.ValueString()})
 
 	if err != nil { // coverage-ignore

@@ -12,38 +12,33 @@ provider "boxer" {
 resource "boxer_issuer_cedar_schema" "example" {
    id = "{{ .ObjectName }}"
       data_json = <<EOT
-      {
-        "PhotoApp": {
-          "commonTypes": {
-            "PersonType": {
-              "type": "Record",
-              "attributes": {
-                "age": {
-                  "type": "Long"
-                },
-                "name": {
-                  "type": "String"
-                }
-              }
-            }
-          },
-          "entityTypes": {
-            "User": {
-              "shape": {
-                "type": "Record",
-                "attributes": {
-                  "personInformation": {
-                    "type": "PersonType"
-                  },
-                  "userId": {
-                    "type": "String"
-                  }
-                }
-              }
-            }
-          },
-          "actions": {}
+{
+  "PhotoApp": {
+    "commonTypes": {
+      "PersonType": {
+        "type": "Record",
+        "attributes": {
+          "age": { "type": "Long" },
+          "name": { "type": "String" }
         }
       }
+    },
+    "entityTypes": {
+      "User": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "personInformation": {
+              "type": "EntityOrCommon",
+              "name": "PersonType"
+            },
+            "userId": { "type": "String" }
+          }
+        }
+      }
+    },
+    "actions": {}
+  }
+}
 EOT
 }
