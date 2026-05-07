@@ -10,6 +10,7 @@ provider "boxer" {
 }
 resource "boxer_validator_cedar_schema" "example" {
   id        = "{{ .ObjectName }}"
+  validate_data_json = true
   data_json = <<EOT
   {
   "PhotoApp": {
@@ -52,23 +53,8 @@ resource "boxer_validator_cedar_schema" "example" {
             "Photo"
           ],
           "context": {
-            "type": "Record",
-            "attributes": {
-              "authenticated": {
-                "type": "Boolean"
-              },
-              "photo": {
-                "type": "Record",
-                "attributes": {
-                  "file_size": {
-                    "type": "Long"
-                  },
-                  "file_type": {
-                    "type": "String"
-                  }
-                }
-              }
-            }
+            "type": "EntityOrCommon",
+            "name": "ContextType"
           }
         }
       }

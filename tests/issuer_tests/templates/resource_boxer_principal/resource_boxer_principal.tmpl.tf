@@ -11,6 +11,7 @@ provider "boxer" {
 
 resource "boxer_issuer_cedar_schema" "example" {
    id = "{{ .ObjectName }}"
+   validate_data_json = true
       data_json = <<EOT
       {
         "PhotoApp": {

@@ -24,7 +24,8 @@ resource "boxer_identity_provider" "example" {
 
 resource "boxer_issuer_cedar_schema" "example" {
    id = "{{ .ObjectName }}-issuer"
-      data_json = <<EOT
+   validate_data_json = true
+   data_json = <<EOT
       {
         "PhotoApp": {
           "commonTypes": {
@@ -62,6 +63,7 @@ EOT
 
 resource "boxer_validator_cedar_schema" "example" {
   id        = "{{ .ObjectName }}-validator"
+  validate_data_json = true
   data_json = <<EOT
   {
     "PhotoApp": {

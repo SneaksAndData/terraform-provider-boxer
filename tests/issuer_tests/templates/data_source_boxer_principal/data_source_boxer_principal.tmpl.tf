@@ -11,7 +11,8 @@ provider "boxer" {
 
 resource "boxer_issuer_cedar_schema" "example" {
    id = "{{ .ObjectName }}"
-      data_json = <<EOT
+   validate_data_json = true
+   data_json = <<EOT
       {
         "PhotoApp": {
           "commonTypes": {
