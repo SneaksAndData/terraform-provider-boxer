@@ -9,7 +9,6 @@ import (
 )
 
 func TestResourceInvalidCedarSchema_creation(t *testing.T) {
-	const resourceAddress = "boxer_validator_cedar_schema.example"
 	const templateName = "resource_invalid_cedar_schema/resource_invalid_cedar_schema.tmpl.tf"
 
 	randomName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
