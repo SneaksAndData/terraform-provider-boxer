@@ -155,7 +155,7 @@ func (resource *cedarSchemaResource) Update(ctx context.Context, request resourc
 		return
 	}
 
-	err = saveNewState(ctx, stateModel.ID.ValueString(), stateModel.DataJson.ValueString(), stateModel.ValidateDataJson.ValueBool(), &response.State, &response.Diagnostics)
+	err = saveNewState(ctx, stateModel.ID.ValueString(), planModel.DataJson.ValueString(), planModel.ValidateDataJson.ValueBool(), &response.State, &response.Diagnostics)
 	// If we can't save the stateModel, we can't proceed with the update.
 	// so we return early.
 	// The error will be handled by the framework and returned to the user.
