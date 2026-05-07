@@ -71,7 +71,6 @@ func (resource *cedarSchemaResource) Create(ctx context.Context, request resourc
 	var unmarshalled cedarschema.Schema
 	err = unmarshalled.UnmarshalJSON([]byte(planModel.DataJson.ValueString()))
 	if err != nil {
-		// TODO: add error or diagnostics
 		tflog.Error(ctx, fmt.Sprintf("Invalid Schema: %s", err))
 		response.Diagnostics.AddError("Invalid Cedar schema.", fmt.Sprintf("Error: %s", err))
 		return
