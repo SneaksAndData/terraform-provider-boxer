@@ -51,10 +51,7 @@ resource "boxer_validator_cedar_schema" "integration_test" {
             ],
             "resourceTypes": [
                 "Photo"
-            ],
-            "context": {
-                "type": "ContextType"
-            }
+            ]
           }
         }
       }
