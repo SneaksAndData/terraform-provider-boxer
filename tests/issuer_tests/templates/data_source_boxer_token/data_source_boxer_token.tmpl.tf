@@ -46,7 +46,8 @@ resource "boxer_issuer_cedar_schema" "example" {
                 "type": "Record",
                 "attributes": {
                   "personInformation": {
-                    "type": "PersonType"
+                    "type": "EntityOrCommon",
+                    "name": "PersonType"
                   },
                   "userId": {
                     "type": "String"
@@ -99,14 +100,11 @@ resource "boxer_validator_cedar_schema" "example" {
         "viewPhoto": {
           "appliesTo": {
             "principalTypes": [
-                "User"
+              "PhotoApp::User"
             ],
             "resourceTypes": [
-                "Photo"
-            ],
-            "context": {
-                "type": "ContextType"
-            }
+              "PhotoApp::Photo"
+            ]
           }
         }
       }

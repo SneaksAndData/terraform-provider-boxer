@@ -47,14 +47,11 @@ resource "boxer_validator_cedar_schema" "integration_test" {
         "viewPhoto": {
           "appliesTo": {
             "principalTypes": [
-                "User"
+              "PhotoApp::User"
             ],
             "resourceTypes": [
-                "Photo"
-            ],
-            "context": {
-                "type": "ContextType"
-            }
+              "PhotoApp::Photo"
+            ]
           }
         }
       }
