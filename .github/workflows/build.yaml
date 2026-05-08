@@ -17,14 +17,14 @@ jobs:
       pull-requests: write # required for dependabot PRs
       contents: read       # required for dependabot PRs
     steps:
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v6.0.2
 
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.6.6"
 
       - name: Setup Go
-        uses: actions/setup-go@v6.1.0
+        uses: actions/setup-go@v6.3.0
         with:
           go-version: '1.24.*'
 
