@@ -9,10 +9,10 @@ dependencies:
     version: "v0.0.5"
     repository: "oci://ghcr.io/sneaksanddata/helm"
   - name: boxer-issuer
-    version: "v0.0.14"
+    version: "v0.0.18"
     repository: "oci://ghcr.io/sneaksanddata/helm"
   - name: boxer-validator-nginx
-    version: "v0.0.15"
+    version: "v0.0.20"
     repository: "oci://ghcr.io/sneaksanddata/helm"
 
 
