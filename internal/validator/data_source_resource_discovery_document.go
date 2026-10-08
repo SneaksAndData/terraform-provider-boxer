@@ -3,12 +3,13 @@ package validator
 import (
 	"context"
 	"fmt"
+	"terraform-provider-boxer/internal/common"
+	"terraform-provider-boxer/pkg/generated/api/validatorClient"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"terraform-provider-boxer/internal/common"
-	"terraform-provider-boxer/pkg/generated/api/validatorClient"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -49,13 +50,13 @@ func (dataSource *resourceDiscoveryDocumentDataSource) Schema(_ context.Context,
 				Description: "The unique identifier of the resource discovery document.",
 				Required:    true,
 			},
+			"schema": schema.StringAttribute{
+				Description: "The schema that the action discovery document belongs to.",
+				Required:    true,
+			},
 			"hostname": schema.StringAttribute{
 				Description: "The hostname of the resource discovery document.",
 				Computed:    true,
-			},
-			"schema": schema.StringAttribute{
-				Description: "The schema that the action discovery document belongs to.",
-				Computed:    true, // TODO: fix here and in other files
 			},
 			"routes": schema.ListNestedAttribute{
 				Description: "The list of routes for the resource discovery document.",

@@ -1,17 +1,17 @@
 package issuer_tests
 
 import (
+	helpers "terraform-provider-boxer/tests"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	helpers "terraform-provider-boxer/tests"
-	"testing"
 )
 
 func TestDataSourceResourceDiscoveryDocument_reading(t *testing.T) {
-	t.Skip("Skipping because of the bug #56")
 
 	const resourceAddress = "data.boxer_resource_discovery_document.example"
 	const templateName = "data_source_resource_discovery_document/data_source_resource_discovery_document.tmpl.tf"
