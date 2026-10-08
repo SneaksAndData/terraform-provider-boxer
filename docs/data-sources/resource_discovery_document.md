@@ -18,12 +18,12 @@ description: |-
 ### Required
 
 - `id` (String) The unique identifier of the resource discovery document.
+- `schema` (String) The schema that the action discovery document belongs to.
 
 ### Read-Only
 
 - `hostname` (String) The hostname of the resource discovery document.
 - `routes` (Attributes List) The list of routes for the resource discovery document. (see [below for nested schema](#nestedatt--routes))
-- `schema` (String) The schema that the action discovery document belongs to.
 
 <a id="nestedatt--routes"></a>
 ### Nested Schema for `routes`

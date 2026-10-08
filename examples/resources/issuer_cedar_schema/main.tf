@@ -8,8 +8,8 @@ terraform {
 
 provider "boxer" {
   external_auth = {
-    security_token = "<insert-token-here>"
-    identity_provider_id = "keycloak"
+    security_token                   = "<insert-token-here>"
+    identity_provider_id             = "keycloak"
     internal_token_provider_endpoint = "http://localhost:5555/issuer"
   }
 
