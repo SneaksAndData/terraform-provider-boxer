@@ -19,3 +19,7 @@ description: |-
 
 - `data_json` (String) The schema data in JSON format.
 - `id` (String) The unique identifier of the identity provider.
+
+### Optional
+
+- `validate_data_json` (Boolean) Validate dataJSON against Cedar.

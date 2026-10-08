@@ -84,4 +84,5 @@ resource "boxer_resource_discovery_document" "example" {
 
 data "boxer_resource_discovery_document" "example" {
     id       = boxer_resource_discovery_document.example.id
+    schema   = boxer_validator_cedar_schema.integration_test.id
 }
