@@ -50,8 +50,6 @@ jobs:
 
       - name: Lint
         uses: golangci/golangci-lint-action@v9
-        with:
-          version: v2.1.0
 
       - name: Run integration tests
         run: TF_ACC=1 go test -v ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
