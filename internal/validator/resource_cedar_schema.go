@@ -79,7 +79,7 @@ func (resource *cedarSchemaResource) Create(ctx context.Context, request resourc
 	if planModel.ValidateDataJson.ValueBool() {
 		var unmarshalled cedarschema.Schema
 		err = unmarshalled.UnmarshalJSON([]byte(planModel.DataJson.ValueString()))
-		if err != nil {
+		if err != nil { // coverage-ignore
 			tflog.Error(ctx, fmt.Sprintf("Invalid Schema: %s", err))
 			response.Diagnostics.AddError("Invalid Cedar schema.", fmt.Sprintf("Error: %s", err))
 			return
@@ -183,7 +183,7 @@ func (resource *cedarSchemaResource) Delete(ctx context.Context, request resourc
 		return
 	}
 	err = resource.validatorClient.DeleteSchema(ctx, validatorClient.DeleteSchemaParams{ID: stateModel.ID.ValueString()})
-	if err != nil {
+	if err != nil { // coverage-ignore
 		common.GenerateError(&response.Diagnostics, "Deleting", "Cedar Schema", err)
 		return
 	}

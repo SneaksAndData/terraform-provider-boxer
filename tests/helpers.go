@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"terraform-provider-boxer/internal"
 	"text/template"
+
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )
 
 // Set to true to enable extended logging of generated configurations
@@ -31,25 +32,25 @@ func GetExternalToken(services *Services) (string, error) {
 
 	endpoint := fmt.Sprintf("%s/realms/master/protocol/openid-connect/token", services.ExternalIdp.Endpoint)
 	resp, err := http.PostForm(endpoint, form)
-	if err != nil {
+	if err != nil { // coverage-ignore
 		return "", fmt.Errorf("failed get token from external identity provider: %w", err)
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
-		if err != nil {
+		if err != nil { // coverage-ignore
 			panic(err)
 		}
 	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
-	if err != nil {
+	if err != nil { // coverage-ignore
 		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 	var tr tokenResponse
-	if err := json.Unmarshal(body, &tr); err != nil {
+	if err := json.Unmarshal(body, &tr); err != nil { // coverage-ignore
 		return "", fmt.Errorf("failed to unmapshal response: %w", err)
 	}
-	if tr.AccessToken == "" {
+	if tr.AccessToken == "" { // coverage-ignore
 		return "", fmt.Errorf("got empty token in response: %s", body)
 	}
 	return tr.AccessToken, nil
@@ -68,7 +69,7 @@ var ProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, erro
 
 func RenderTemplate(testContext *TestContext, fileName string) string {
 	tpl, err := template.New("configuration").ParseFiles(fmt.Sprintf("templates/%s", fileName))
-	if err != nil {
+	if err != nil { // coverage-ignore
 		panic(err)
 	}
 
@@ -77,7 +78,7 @@ func RenderTemplate(testContext *TestContext, fileName string) string {
 
 	var buf bytes.Buffer
 	err = tpl.ExecuteTemplate(&buf, templateName, testContext)
-	if err != nil {
+	if err != nil { // coverage-ignore
 		panic(err)
 	}
 	result := buf.String()

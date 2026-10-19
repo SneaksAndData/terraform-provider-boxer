@@ -1,11 +1,12 @@
 package issuer_tests
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"regexp"
 	helpers "terraform-provider-boxer/tests"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestResourceInvalidCedarSchema_creation(t *testing.T) {
