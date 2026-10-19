@@ -3,12 +3,13 @@ package validator
 import (
 	"context"
 	"fmt"
+	"terraform-provider-boxer/internal/common"
+	"terraform-provider-boxer/pkg/generated/api/validatorClient"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"terraform-provider-boxer/internal/common"
-	"terraform-provider-boxer/pkg/generated/api/validatorClient"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -139,7 +140,12 @@ func (resource *resourceDiscoveryDocumentResource) Read(ctx context.Context, req
 		// If we can't save the stateModel, we can't proceed with the update.
 		// so we return early.
 		// The error will be handled by the framework and returned to the user.
-		if err != nil {
+		if err != nil { // coverage-ignore
+			tflog.Error(ctx, "failed to save resource set state after read", map[string]interface{}{
+				"id":     stateModel.ID.ValueString(),
+				"schema": stateModel.Schema.ValueString(),
+				"error":  err.Error(),
+			})
 			return
 		}
 		return

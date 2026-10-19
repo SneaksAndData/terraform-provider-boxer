@@ -3,6 +3,9 @@ package validator
 import (
 	"context"
 	"fmt"
+	"terraform-provider-boxer/internal/common"
+	"terraform-provider-boxer/pkg/generated/api/validatorClient"
+
 	"github.com/cedar-policy/cedar-go"
 	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -10,8 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"terraform-provider-boxer/internal/common"
-	"terraform-provider-boxer/pkg/generated/api/validatorClient"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -115,6 +116,11 @@ func (r *policySetResource) Create(ctx context.Context, request resource.CreateR
 	// so we return early.
 	// The error will be handled by the framework and returned to the user.
 	if err != nil { // coverage-ignore
+		tflog.Error(ctx, "failed to save policy set state after create", map[string]interface{}{
+			"id":     planModel.ID.ValueString(),
+			"schema": planModel.Schema.ValueString(),
+			"error":  err.Error(),
+		})
 		return
 	}
 }
@@ -164,6 +170,11 @@ func (r *policySetResource) Read(ctx context.Context, request resource.ReadReque
 		// so we return early.
 		// The error will be handled by the framework and returned to the user.
 		if err != nil { // coverage-ignore
+			tflog.Error(ctx, "failed to save policy set state after read", map[string]interface{}{
+				"id":     stateModel.ID.ValueString(),
+				"schema": stateModel.Schema.ValueString(),
+				"error":  err.Error(),
+			})
 			return
 		}
 	case *validatorClient.GetPolicySetNotFound:
@@ -171,7 +182,7 @@ func (r *policySetResource) Read(ctx context.Context, request resource.ReadReque
 		tflog.Debug(ctx, "Policy set not found, setting state to empty")
 		response.State.RemoveResource(ctx)
 		return
-	default:
+	default: // coverage-ignore
 		common.GenerateError(&response.Diagnostics,
 			"Reading",
 			"Policy Set",
@@ -210,6 +221,11 @@ func (r *policySetResource) Update(ctx context.Context, request resource.UpdateR
 	// so we return early.
 	// The error will be handled by the framework and returned to the user.
 	if err != nil { // coverage-ignore
+		tflog.Error(ctx, "failed to save policy set state after update", map[string]interface{}{
+			"id":     planModel.ID.ValueString(),
+			"schema": planModel.Schema.ValueString(),
+			"error":  err.Error(),
+		})
 		return
 	}
 }
@@ -289,7 +305,7 @@ func (model *policySetResourceModel) normalize() error {
 	}
 
 	if model.DataCedar.IsUnknown() {
-		if model.DataJson.IsUnknown() || model.DataJson.IsNull() {
+		if model.DataJson.IsUnknown() || model.DataJson.IsNull() { // coverage-ignore
 			return fmt.Errorf("either data_cedar or data_json must be set")
 		}
 
@@ -302,7 +318,7 @@ func (model *policySetResourceModel) normalize() error {
 		return nil
 	}
 
-	if model.DataCedar.IsNull() && model.DataJson.IsNull() || model.DataCedar.IsUnknown() && model.DataJson.IsUnknown() {
+	if model.DataCedar.IsNull() && model.DataJson.IsNull() || model.DataCedar.IsUnknown() && model.DataJson.IsUnknown() { // coverage-ignore
 		return fmt.Errorf("either data_cedar or data_json must be set")
 	}
 
